@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.crf.models.Session;
+import org.crf.ws.services.SessionService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,48 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class SessionController {
 	
-	public static Integer nextId;
-	public static Map<Integer, Session> sessionsMap;
-
-	public static Session save(Session session){
-		if(sessionsMap == null){
-			sessionsMap = new HashMap<Integer, Session>();
-			nextId=1;
-		}
-		if(session.getId() != null){
-			Session oldsession = sessionsMap.get(session.getId());
-			if(oldsession==null){
-				return null;
-			}
-			sessionsMap.remove(session.getId());
-			sessionsMap.put(session.getId(), session);
-			return session;
-		}
-		session.setId(nextId);
-		nextId = nextId + 1;
-		sessionsMap.put(nextId, session);
-		return session;
-	}
-
-	public static boolean delete(Session session){
-		Session delsession = sessionsMap.remove(session.getId());
-		if(delsession == null){
-			return false;
-		}
-		else {
-			return true;
-		}
-	}
-	
-	static {
-		Session session1 = new Session();
-		session1.setFormateur("toto");
-		save(session1);
-		
-		Session session2 = new Session();
-		session2.setFormateur("titi");
-		save(session2);			
-	}
+	@Autowired
+	private SessionService sessionService;
 	
 	@RequestMapping(
 			value="/api/sessions", 
@@ -66,7 +28,7 @@ public class SessionController {
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Collection<Session>> getSessions() {
 		
-		Collection<Session> listsession = sessionsMap.values();
+		Collection<Session> listsession = sessionService.findAll();
 		
 		return new ResponseEntity<Collection<Session>>(listsession, HttpStatus.OK);		
 	}
@@ -75,9 +37,9 @@ public class SessionController {
 			value="/api/sessions/{id}",
 			method=RequestMethod.GET,
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Session> getSession(@PathVariable("id") Integer Id){
+	public ResponseEntity<Session> getSession(@PathVariable("id") Integer id){
 		
-		Session session = sessionsMap.get(Id);
+		Session session = sessionService.findOne(id);
 		if(session == null){
 			return new ResponseEntity<Session>(HttpStatus.NOT_FOUND);
 		}
@@ -90,7 +52,7 @@ public class SessionController {
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Session> createSession(@RequestBody Session session) {
 		
-		Session savesession = save(session);
+		Session savesession = sessionService.create(session);
 		
 		return new ResponseEntity<Session>(savesession, HttpStatus.CREATED);		
 	}
@@ -101,7 +63,7 @@ public class SessionController {
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Session> updateSession(@RequestBody Session session) {
 		
-		Session savesession = save(session);
+		Session savesession = sessionService.update(session);
 		
 		if(savesession == null){
 			return new ResponseEntity<Session>(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -113,13 +75,11 @@ public class SessionController {
 			value="/api/sessions/{id}",
 			method=RequestMethod.DELETE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Session> deleteSession(@PathVariable("id") Integer Id){
+	public ResponseEntity<Session> deleteSession(@PathVariable("id") Integer id){
 		
-		boolean testdelete = delete(sessionsMap.get(Id));
+		sessionService.delete(id);
 		
-		if(!testdelete){
-			return new ResponseEntity<Session>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		
 		return new ResponseEntity<Session>(HttpStatus.NO_CONTENT);
 	}
 	
