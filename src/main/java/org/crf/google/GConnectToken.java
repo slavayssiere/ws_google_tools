@@ -103,9 +103,7 @@ public class GConnectToken {
                 .setClientSecrets(clientSecrets)  
                 .build(); 
         
-        credential.setAccessToken(accessToken);  
-        credential.setExpiresInSeconds(expiresInSeconds);  
-        credential.setRefreshToken(refreshToken);  
+        credential.setAccessToken(accessToken);
         
         return credential;
       }

@@ -31,14 +31,15 @@ public class GSheetService {
                 .build();
     }
 
-    public void test(String authCode, String redirectUri) throws Exception {
+    public String test() throws Exception {
         // Build a new authorized API client service.
         Sheets service = getSheetsService();
 
+        String ret = "";
         // Prints the names and majors of students in a sample spreadsheet:
         // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
         String spreadsheetId = "1MgNlnOiQInKaqiwZwaZ1tRxd7gKEON6xLAZR0PRBB6I";
-        String range = "Feuille 1!A1:A2";
+        String range = "Feuille 1!A1:B10";
         ValueRange response = service.spreadsheets().values()
             .get(spreadsheetId, range)
             .execute();
@@ -49,8 +50,9 @@ public class GSheetService {
           System.out.println("Name, Major");
           for (List row : values) {
             // Print columns A and E, which correspond to indices 0 and 4.
-            System.out.printf("%s, %s\n", row.get(0), row.get(4));
+            ret = row.get(0) + " " + row.get(1);
           }
         }
+        return ret;
     }
 }

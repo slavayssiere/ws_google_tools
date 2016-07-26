@@ -29,5 +29,4 @@ public class GoogleCodeFlow {
 	public void setState(String state) {
 		this.state = state;
 	}
-
 }

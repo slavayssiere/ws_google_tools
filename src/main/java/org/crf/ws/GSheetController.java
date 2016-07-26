@@ -1,29 +1,35 @@
 package org.crf.ws;
 
 import java.io.IOException;
+import java.util.Collection;
 
 import org.crf.google.GConnectToken;
-import org.crf.models.GoogleCodeFlow;
+import org.crf.google.GDriveService;
+import org.crf.models.FileDrive;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ConnexionController {
+public class GSheetController {
 
 	@RequestMapping(
-			value="/api/auth/google", 
-			method=RequestMethod.POST, 
+			value="/api/files", 
+			method=RequestMethod.GET, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GConnectToken> getCode(@RequestBody GoogleCodeFlow data) {	
+	public ResponseEntity<Collection<FileDrive>> getCode(@RequestParam("token") String token) {	
 		
+		Collection<FileDrive> ret = null;
 		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.token_create(data.getCode(), data.getRedirectUri());
+			gconnecttoken.setAccessToken(token);
+			gconnecttoken.authorize();
+			GDriveService gss = new GDriveService(gconnecttoken);
+			ret = gss.test();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -32,6 +38,8 @@ public class ConnexionController {
 			e.printStackTrace();
 		}
 		
-		return new ResponseEntity<GConnectToken>(gconnecttoken, HttpStatus.OK);		
+		
+		return new ResponseEntity<Collection<FileDrive>>(ret, HttpStatus.OK);		
 	}
 }
+
