@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,7 +26,8 @@ public class SessionController {
 	@RequestMapping(
 			value="/api/sessions", 
 			method=RequestMethod.GET, 
-			produces=MediaType.APPLICATION_JSON_VALUE)
+			produces=MediaType.APPLICATION_JSON_VALUE,
+			params = "code")
 	public ResponseEntity<Collection<Session>> getSessions() {
 		
 		Collection<Session> listsession = sessionService.findAll();

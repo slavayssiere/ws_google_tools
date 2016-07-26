@@ -1,15 +1,16 @@
 package org.crf.ws.services;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.crf.google.GSheetService;
 import org.crf.models.Session;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SessionServiceBean implements SessionService {
-
 
 	public static Integer nextId;
 	public static Map<Integer, Session> sessionsMap;
@@ -57,6 +58,7 @@ public class SessionServiceBean implements SessionService {
 	
 	@Override
 	public Collection<Session> findAll() {
+				
 		Collection<Session> listsession = sessionsMap.values();
 		return listsession;
 	}
