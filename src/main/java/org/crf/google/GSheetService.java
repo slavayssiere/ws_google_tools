@@ -1,6 +1,9 @@
 package org.crf.google;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+
+import org.crf.models.Session;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.sheets.v4.Sheets;
@@ -31,28 +34,32 @@ public class GSheetService {
                 .build();
     }
 
-    public String test() throws Exception {
+    public Session getState(String spreadsheetId) throws Exception {
         // Build a new authorized API client service.
         Sheets service = getSheetsService();
 
-        String ret = "";
+        Session sess = new Session();
+        SimpleDateFormat formater = new SimpleDateFormat("dd-MM-yyyy");
+        
         // Prints the names and majors of students in a sample spreadsheet:
         // https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
-        String spreadsheetId = "1MgNlnOiQInKaqiwZwaZ1tRxd7gKEON6xLAZR0PRBB6I";
-        String range = "Feuille 1!A1:B10";
-        ValueRange response = service.spreadsheets().values()
-            .get(spreadsheetId, range)
+        ValueRange response = service.spreadsheets().values()        	
+            .get(spreadsheetId, "Admin!B1:E1")
+            .setFields("properties/title,sheets/data/rowData/values/formattedValue")
             .execute();
         List<List<Object>> values = response.getValues();
         if (values == null || values.size() == 0) {
-            System.out.println("No data found.");
+            return null;
         } else {
           System.out.println("Name, Major");
           for (List row : values) {
-            // Print columns A and E, which correspond to indices 0 and 4.
-            ret = row.get(0) + " " + row.get(1);
+            sess.setFormateur((String)row.get(3));
+            sess.setDate(formater.parse((String) row.get(1)));
+            sess.setType((String) row.get(0));
+            
+            System.out.println(row.get(0) + " " + row.get(1) + " " + row.get(3));
           }
         }
-        return ret;
+        return sess;
     }
 }

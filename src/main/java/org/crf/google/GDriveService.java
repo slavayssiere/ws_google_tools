@@ -21,9 +21,7 @@ public class GDriveService {
      */
     public GDriveService(GConnectToken newgct) {
         gct = newgct;
-    }
-
-    
+    }    
     
     /**
      * Build and return an authorized Sheets API client service.
@@ -37,7 +35,7 @@ public class GDriveService {
                 .build();
     }
 
-    public Collection<FileDrive> test() throws Exception {
+    public Collection<FileDrive> getListSheet() throws Exception {
         // Build a new authorized API client service.
         Drive service = getDriveService();
 

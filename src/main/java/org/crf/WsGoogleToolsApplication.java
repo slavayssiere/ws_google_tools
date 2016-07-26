@@ -21,6 +21,7 @@ public class WsGoogleToolsApplication {
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/auth/google").allowedOrigins("http://localhost:8080");
                 registry.addMapping("/api/files").allowedOrigins("http://localhost:8080");
+                registry.addMapping("/api/sheets/state").allowedOrigins("http://localhost:8080");
             }
         };
     }
