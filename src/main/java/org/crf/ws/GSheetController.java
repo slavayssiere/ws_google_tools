@@ -1,12 +1,15 @@
 package org.crf.ws;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.crf.google.GConnectToken;
 import org.crf.google.GDriveService;
 import org.crf.google.GSheetService;
 import org.crf.models.FileDrive;
+import org.crf.models.Session;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -47,18 +50,26 @@ public class GSheetController {
 			value="/api/sheets/state", 
 			method=RequestMethod.GET, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Collection<FileDrive>> getStates(@RequestParam("token") String token) {	
+	public ResponseEntity<List<Session>> getStates(@RequestParam("token") String token) {	
 		
-		Collection<FileDrive> ret = null;
+		List<Session> sessionColl = new ArrayList<Session>();
 		GConnectToken gconnecttoken = new GConnectToken();
 		try {
 			gconnecttoken.setAccessToken(token);
 			gconnecttoken.authorize();
 			GDriveService gdriveserv = new GDriveService(gconnecttoken);
-			ret = gdriveserv.getListSheet();
-			for(FileDrive file : ret){
+			int id = 0;
+			for(FileDrive file : gdriveserv.getListSheet()){
+				//System.out.println("file:" + file.getName());
+				//System.out.println("fileid:" + file.getId());
 				GSheetService gss = new GSheetService(gconnecttoken);
-				gss.getState(file.getId());
+				Session sess = gss.getState(file.getId(), id);
+				if(sess != null){
+					sess.setGoogle_id(file.getId());
+					sess.setGoogle_name(file.getName());
+					sessionColl.add(sess);
+					id++;
+				}
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -69,7 +80,7 @@ public class GSheetController {
 		}
 		
 		
-		return new ResponseEntity<Collection<FileDrive>>(ret, HttpStatus.OK);		
+		return new ResponseEntity<List<Session>>(sessionColl, HttpStatus.OK);		
 	}
 }
 

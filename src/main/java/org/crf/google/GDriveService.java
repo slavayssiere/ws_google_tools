@@ -39,20 +39,20 @@ public class GDriveService {
         // Build a new authorized API client service.
         Drive service = getDriveService();
 
-        Map<String, FileDrive> ret = new HashMap<String, FileDrive>();
+        Map<String, FileDrive> ret = new HashMap<String, FileDrive>();   
         
-        FileList result = service.files().list()	       
-	        .setFields("files(description,id,name,mimeType),nextPageToken")
+        
+        FileList result =  service.files().list()	       
+	        .setFields("files(id,name,mimeType),nextPageToken")
+	        .setQ("mimeType='application/vnd.google-apps.spreadsheet' and name contains '2016'")
 	        .setPageSize(1000)
 	        .execute();
         
         for(File file : result.getFiles()){
-        	if(file.getMimeType().equals("application/vnd.google-apps.spreadsheet")){
-	        	FileDrive fd = new FileDrive();
-	        	fd.setId(file.getId());
-	        	fd.setName(file.getName());
-	        	ret.put(file.getId(), fd);
-        	}
+        	FileDrive fd = new FileDrive();
+        	fd.setId(file.getId());
+        	fd.setName(file.getName());
+        	ret.put(file.getId(), fd);        	
         }
         	        
         return ret.values();
