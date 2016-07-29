@@ -23,6 +23,7 @@ public class WsGoogleToolsApplication {
                 registry.addMapping("/api/files").allowedOrigins("http://localhost:8080");
                 registry.addMapping("/api/sheets/state").allowedOrigins("http://localhost:8080");
                 registry.addMapping("/api/sheets/create").allowedOrigins("http://localhost:8080");
+                registry.addMapping("/api/sheets/launchscript").allowedOrigins("http://localhost:8080");
             }
         };
     }
