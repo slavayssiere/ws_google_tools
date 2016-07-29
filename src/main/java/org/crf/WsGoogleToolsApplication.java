@@ -19,11 +19,16 @@ public class WsGoogleToolsApplication {
         return new WebMvcConfigurerAdapter() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/auth/google").allowedOrigins("http://localhost:8080");
-                registry.addMapping("/api/files").allowedOrigins("http://localhost:8080");
-                registry.addMapping("/api/sheets/state").allowedOrigins("http://localhost:8080");
-                registry.addMapping("/api/sheets/create").allowedOrigins("http://localhost:8080");
-                registry.addMapping("/api/sheets/launchscript").allowedOrigins("http://localhost:8080");
+            	listApi(registry, "http://localhost:8080");
+            	listApi(registry, "http://ul-management.s3-website-eu-west-1.amazonaws.com");
+            }
+            
+            public void listApi(CorsRegistry registry, String url){
+            	registry.addMapping("/api/auth/google").allowedOrigins(url);
+                registry.addMapping("/api/files").allowedOrigins(url);
+                registry.addMapping("/api/sheets/state").allowedOrigins(url);
+                registry.addMapping("/api/sheets/create").allowedOrigins(url);
+                registry.addMapping("/api/sheets/launchscript").allowedOrigins(url);
             }
         };
     }
