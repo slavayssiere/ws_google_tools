@@ -3,6 +3,7 @@ package org.crf.ws;
 import java.io.IOException;
 
 import org.crf.google.GConnectToken;
+import org.crf.google.GUserInfo;
 import org.crf.models.GoogleCodeFlow;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,6 +31,12 @@ public class ConnexionController {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		
+
+		GUserInfo gui = new GUserInfo(gconnecttoken);
+		if (!gui.getUserEmail().equals("inscription.crf7511@gmail.com")) {
+			return new ResponseEntity<GConnectToken>(new GConnectToken(), HttpStatus.FORBIDDEN);
 		}
 		
 		return new ResponseEntity<GConnectToken>(gconnecttoken, HttpStatus.OK);		

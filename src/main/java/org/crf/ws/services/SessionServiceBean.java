@@ -1,11 +1,9 @@
 package org.crf.ws.services;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.crf.google.GSheetService;
 import org.crf.models.Session;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +52,6 @@ public class SessionServiceBean implements SessionService {
 		session2.setFormateur("titi");
 		save(session2);			
 	}
-	
 	
 	@Override
 	public Collection<Session> findAll() {

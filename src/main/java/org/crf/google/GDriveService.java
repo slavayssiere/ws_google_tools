@@ -1,8 +1,8 @@
 package org.crf.google;
 
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.crf.models.FileDrive;
@@ -15,6 +15,7 @@ import com.google.api.services.drive.model.FileList;
 
 public class GDriveService {
 	GConnectToken gct;
+	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
     /** Constructor
      * 
@@ -57,4 +58,20 @@ public class GDriveService {
         	        
         return ret.values();
     }
+
+	public Session copy(String fileId, Session sess) throws Exception {
+		Drive service = getDriveService();
+		
+		String copyTitle = dt1.format(sess.getDate()) +  " " + sess.getType() + " " + sess.getFormateur();
+		File copiedFile = new File();
+	    copiedFile.setName(copyTitle);
+	    
+		File newfile = service.files().copy(fileId, copiedFile).execute();
+		
+		sess.setGoogle_id(newfile.getId());
+		sess.setGoogle_name(copyTitle);
+		
+		return sess;
+	}
+	
 }

@@ -14,6 +14,8 @@ public class Session {
 	
 	private Date date;
 	
+	private Integer heure;
+	
 	private Integer id;
 	
 	private String type;
@@ -114,5 +116,13 @@ public class Session {
 	@JsonProperty("nb_empty")
 	public Integer getNbEmpty(){
 		return this.emptyRows.size();
+	}
+
+	public Integer getHeure() {
+		return heure;
+	}
+
+	public void setHeure(Integer heure) {
+		this.heure = heure;
 	}
 }

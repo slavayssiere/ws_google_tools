@@ -3,6 +3,8 @@ package org.crf.google;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.crf.models.Inscription;
@@ -11,7 +13,19 @@ import org.crf.models.Session;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
+import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
+import com.google.api.services.sheets.v4.model.CellData;
+import com.google.api.services.sheets.v4.model.CellFormat;
+import com.google.api.services.sheets.v4.model.Color;
+import com.google.api.services.sheets.v4.model.ExtendedValue;
+import com.google.api.services.sheets.v4.model.GridCoordinate;
+import com.google.api.services.sheets.v4.model.Request;
+import com.google.api.services.sheets.v4.model.RowData;
+import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import com.google.common.util.concurrent.ExecutionList;
 
 public class GSheetService {
 	
@@ -38,11 +52,13 @@ public class GSheetService {
                 .build();
     }
 
+
+    SimpleDateFormat formaterHyphen = new SimpleDateFormat("dd-MM-yyyy");
+    SimpleDateFormat formaterSlash = new SimpleDateFormat("dd/MM/yyyy");
+    
     public Session getState(String spreadsheetId, int id) throws Exception {
         Sheets service = getSheetsService();
         Session sess = new Session();
-        SimpleDateFormat formaterHyphen = new SimpleDateFormat("dd-MM-yyyy");
-        SimpleDateFormat formaterSlash = new SimpleDateFormat("dd/MM/yyyy");
         
         ValueRange response;
 		try {
@@ -106,5 +122,34 @@ public class GSheetService {
           }
         }
         return sess;
+    }
+    
+    public void updateNewSheet(Session sess) throws Exception{
+    	Sheets service = getSheetsService();
+
+    	List<Request> requests = new ArrayList<>();
+    	List<CellData> values = new ArrayList<>();
+    	values.add(new CellData()
+    	        .setUserEnteredValue(new ExtendedValue().setStringValue(sess.getType())));
+    	values.add(new CellData()
+    	        .setUserEnteredValue(new ExtendedValue().setStringValue(this.formaterHyphen.format(sess.getDate()))));
+    	values.add(new CellData()
+    	        .setUserEnteredValue(new ExtendedValue().setNumberValue(Double.valueOf(sess.getHeure()))));
+    	values.add(new CellData()
+    	        .setUserEnteredValue(new ExtendedValue().setStringValue(sess.getFormateur())));
+    	requests.add(new Request()
+    	        .setUpdateCells(new UpdateCellsRequest()
+    	        .setStart(new GridCoordinate()
+    	                        .setSheetId(0)
+    	                        .setRowIndex(0)
+    	                        .setColumnIndex(1))
+    	                .setRows(Arrays.asList(new RowData().setValues(values)))
+    	                .setFields("userEnteredValue")));
+    	
+    	BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest()
+    	        .setRequests(requests);
+    	
+    	service.spreadsheets().batchUpdate(sess.getGoogle_id(), batchUpdateRequest)
+    	        .execute();    	    	    
     }
 }
