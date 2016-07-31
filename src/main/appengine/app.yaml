@@ -1,0 +1,5 @@
+runtime: custom
+vm: true
+module: ws-google
+manual-scaling:
+  instances: 1
