@@ -83,10 +83,19 @@ public class GConnectToken {
         //clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
         //    new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
 
-
+        System.out.println(object.getBucketName());
+        System.out.println(object.getKey());
+        System.out.println(object.getObjectContent().toString());
+        
+        
         clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
             new InputStreamReader(object.getObjectContent()));
 
+        System.out.println("test");
+        System.out.println("clientid:" + clientSecrets.getDetails().getClientId());
+        System.out.println("clientsecret:" + clientSecrets.getDetails().getClientSecret());
+        System.out.println("authCode:" + authCode);
+        
         // set up authorization code flow
         GoogleTokenResponse tokenResponse =  
                 new GoogleAuthorizationCodeTokenRequest(  
