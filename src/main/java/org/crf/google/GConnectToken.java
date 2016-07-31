@@ -130,6 +130,11 @@ public class GConnectToken {
         clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
             new InputStreamReader(getS3Data().getObjectContent()));
         
+        System.out.println("test");
+        System.out.println("clientid:" + clientSecrets.getDetails().getClientId());
+        System.out.println("clientsecret:" + clientSecrets.getDetails().getClientSecret());
+        
+        
         // authorize        
         GoogleCredential credential = new GoogleCredential.Builder()  
                 .setTransport(new NetHttpTransport())  
