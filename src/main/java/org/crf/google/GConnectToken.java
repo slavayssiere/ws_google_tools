@@ -1,6 +1,7 @@
 package org.crf.google;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
@@ -60,9 +61,8 @@ public class GConnectToken {
             System.exit(1);
         }
     }
-
-    public boolean token_create(String authCode, String redirectUri) throws Exception {
-        // load client secrets
+    
+    private S3Object getS3Data(){
     	AWSCredentials credentials = null;
         try {
             credentials = new ProfileCredentialsProvider().getCredentials();
@@ -78,13 +78,18 @@ public class GConnectToken {
         Region euWest1 = Region.getRegion(Regions.EU_WEST_1);
         s3.setRegion(euWest1);
         
-        S3Object object = s3.getObject(new GetObjectRequest("static-private-file", "client_secret_oauth.json"));
+        return s3.getObject(new GetObjectRequest("static-private-file", "client_secret_oauth.json"));
         
+    }
+
+    public boolean token_create(String authCode, String redirectUri) throws Exception {
+        // load client secrets
+    	
         //clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
         //    new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
         
         clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-            new InputStreamReader(object.getObjectContent()));
+            new InputStreamReader(getS3Data().getObjectContent()));
 
         // set up authorization code flow
         GoogleTokenResponse tokenResponse =  
@@ -123,7 +128,7 @@ public class GConnectToken {
     public Credential authorize() throws Exception {
         // load client secrets
         clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-            new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
+            new InputStreamReader(getS3Data().getObjectContent()));
         
         // authorize        
         GoogleCredential credential = new GoogleCredential.Builder()  
