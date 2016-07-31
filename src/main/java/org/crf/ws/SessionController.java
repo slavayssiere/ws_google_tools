@@ -26,8 +26,7 @@ public class SessionController {
 	@RequestMapping(
 			value="/api/sessions", 
 			method=RequestMethod.GET, 
-			produces=MediaType.APPLICATION_JSON_VALUE,
-			params = "code")
+			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Collection<Session>> getSessions() {
 		
 		Collection<Session> listsession = sessionService.findAll();
