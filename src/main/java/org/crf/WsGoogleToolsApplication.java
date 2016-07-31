@@ -24,6 +24,7 @@ public class WsGoogleToolsApplication {
             }
             
             public void listApi(CorsRegistry registry, String url){
+                registry.addMapping("/").allowedOrigins(url);
             	registry.addMapping("/api/auth/google").allowedOrigins(url);
                 registry.addMapping("/api/files").allowedOrigins(url);
                 registry.addMapping("/api/sheets/state").allowedOrigins(url);
