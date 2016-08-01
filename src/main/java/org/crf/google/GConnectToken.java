@@ -105,11 +105,6 @@ public class GConnectToken {
                     redirectUri)  
                    .execute();  
         
-        System.out.println("test");
-        System.out.println("clientid:" + clientSecrets.getDetails().getClientId());
-        System.out.println("clientsecret:" + clientSecrets.getDetails().getClientSecret());
-        System.out.println("authCode:" + authCode);
-        
         accessToken = tokenResponse.getAccessToken();  
         refreshToken = tokenResponse.getRefreshToken();  
         expiresInSeconds = tokenResponse.getExpiresInSeconds(); 
