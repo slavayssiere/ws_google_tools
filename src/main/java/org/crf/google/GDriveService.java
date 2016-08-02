@@ -1,5 +1,6 @@
 package org.crf.google;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.HashMap;
@@ -72,6 +73,26 @@ public class GDriveService {
 		sess.setGoogle_name(copyTitle);
 		
 		return sess;
+	}
+
+	public FileDrive getSheetByName(String titleFile) throws Exception {
+		Drive service = getDriveService();
+
+        Map<String, FileDrive> ret = new HashMap<String, FileDrive>();   
+        
+        
+        FileList result = service.files().list()	       
+	        .setFields("files(id,name,mimeType),nextPageToken")
+	        .setQ("mimeType='application/vnd.google-apps.spreadsheet' and name contains '"+titleFile+"'")
+	        .setPageSize(1000)
+	        .execute();
+        
+        File file = result.getFiles().get(0);
+    	FileDrive fd = new FileDrive();
+    	fd.setId(file.getId());
+    	fd.setName(file.getName());    
+        	        
+        return fd;
 	}
 	
 }

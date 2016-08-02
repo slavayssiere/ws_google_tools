@@ -23,13 +23,15 @@ public class WsGoogleToolsApplication {
             }
             
             public void listApi(CorsRegistry registry, String url, String url2){
-                registry.addMapping("/").allowedOrigins(url, url2);
                 registry.addMapping("/info").allowedOrigins(url, url2);
             	registry.addMapping("/api/auth/google").allowedOrigins(url, url2);
                 registry.addMapping("/api/files").allowedOrigins(url, url2);
                 registry.addMapping("/api/sheets/state").allowedOrigins(url, url2);
                 registry.addMapping("/api/sheets/create").allowedOrigins(url, url2);
                 registry.addMapping("/api/sheets/launchscript").allowedOrigins(url, url2);
+                registry.addMapping("/api/sheets/getemails").allowedOrigins(url, url2);
+                registry.addMapping("/api/sheets/inscription/{sheetid}/{row}").allowedOrigins(url, url2);
+                registry.addMapping("/api/sheets/complete").allowedOrigins(url, url2);
             }
         };
     }

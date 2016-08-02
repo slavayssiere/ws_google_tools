@@ -36,7 +36,6 @@ public class GUserInfo {
 			service = getOauth2Service();
 	    	uinfo = service.userinfo().get().execute();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         System.out.println("connection email:" + uinfo.getEmail());

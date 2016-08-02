@@ -1,17 +1,15 @@
 package org.crf.google;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.crf.models.ScriptReturn;
-
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.services.script.Script;
 import com.google.api.services.script.model.ExecutionRequest;
 import com.google.api.services.script.model.Operation;
@@ -34,9 +32,9 @@ public class GScriptService {
 	 * @return an authorized Sheets API client service
 	 * @throws Exception
 	 */
-	public Script getScriptService() throws Exception {
+	private Script getScriptService() throws Exception {
 		Credential credential = gct.authorize();
-		return new Script.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), credential)
+		return new Script.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), GConnectToken.setHttpTimeout(credential))
 				.setApplicationName(gct.getAPPLICATION_NAME()).build();
 	}
 
@@ -75,13 +73,15 @@ public class GScriptService {
 		if (op.getError() != null) {
 			// The API executed, but the script returned an error.
 			System.out.println(getScriptError(op));
+			sr.setError(getScriptError(op));
 		} else {
 			// The result provided by the API needs to be cast into
 			// the correct type, based upon what types the Apps
 			// Script function returns. Here, the function returns
 			// an Apps Script Object with String keys and values,
 			// so must be cast into a Java Map (folderSet).
-			sr.setData(op.getResponse().get("result"));
+			BigDecimal bd = (BigDecimal) op.getResponse().get("result");
+			sr.setNbLines(bd.intValue());
 		}
 
 		return sr;
@@ -95,7 +95,7 @@ public class GScriptService {
 	 *            op the Operation returning an error response
 	 * @return summary of error response, or null if Operation returned no error
 	 */
-	public static String getScriptError(Operation op) {
+	private static String getScriptError(Operation op) {
 		if (op.getError() == null) {
 			return null;
 		}
@@ -127,26 +127,5 @@ public class GScriptService {
 		return sb.toString();
 	}
 
-	/**
-	 * Create a HttpRequestInitializer from the given one, except set the HTTP
-	 * read timeout to be longer than the default (to allow called scripts time
-	 * to execute).
-	 *
-	 * @param {HttpRequestInitializer}
-	 *            requestInitializer the initializer to copy and adjust;
-	 *            typically a Credential object.
-	 * @return an initializer with an extended read timeout.
-	 */
-	private static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
-		return new HttpRequestInitializer() {
-			@Override
-			public void initialize(HttpRequest httpRequest) throws IOException {
-				requestInitializer.initialize(httpRequest);
-				// This allows the API to call (and avoid timing out on)
-				// functions that take up to 6 minutes to complete (the maximum
-				// allowed script run time), plus a little overhead.
-				httpRequest.setReadTimeout(380000);
-			}
-		};
-	}
+	
 }

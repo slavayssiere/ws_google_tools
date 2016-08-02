@@ -41,15 +41,4 @@ public class ConnexionController {
 		
 		return new ResponseEntity<GConnectToken>(gconnecttoken, HttpStatus.OK);		
 	}
-	
-	@RequestMapping(
-			value="/", 
-			method=RequestMethod.GET, 
-			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<String> getVersion() {	
-		
-		
-		
-		return new ResponseEntity<String>("0.0.1", HttpStatus.OK);		
-	}
 }

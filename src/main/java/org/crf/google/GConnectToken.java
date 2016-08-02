@@ -24,6 +24,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
@@ -124,19 +126,17 @@ public class GConnectToken {
      */
     public Credential authorize() throws Exception {
         // load client secrets
+    	//clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+        //        new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
+    	
         clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
             new InputStreamReader(getS3Data().getObjectContent()));
-        
-        System.out.println("test");
-        System.out.println("clientid:" + clientSecrets.getDetails().getClientId());
-        System.out.println("clientsecret:" + clientSecrets.getDetails().getClientSecret());
-        
         
         // authorize        
         GoogleCredential credential = new GoogleCredential.Builder()  
                 .setTransport(new NetHttpTransport())  
                 .setJsonFactory(JSON_FACTORY)  
-                .setClientSecrets(clientSecrets)  
+                .setClientSecrets(clientSecrets)
                 .build(); 
         
         credential.setAccessToken(accessToken);
@@ -186,5 +186,28 @@ public class GConnectToken {
 	@JsonIgnore
 	public JsonFactory getJSON_FACTORY() {
 		return JSON_FACTORY;
+	}
+	
+	/**
+	 * Create a HttpRequestInitializer from the given one, except set the HTTP
+	 * read timeout to be longer than the default (to allow called scripts time
+	 * to execute).
+	 *
+	 * @param {HttpRequestInitializer}
+	 *            requestInitializer the initializer to copy and adjust;
+	 *            typically a Credential object.
+	 * @return an initializer with an extended read timeout.
+	 */
+	public static HttpRequestInitializer setHttpTimeout(final HttpRequestInitializer requestInitializer) {
+		return new HttpRequestInitializer() {
+			@Override
+			public void initialize(HttpRequest httpRequest) throws IOException {
+				requestInitializer.initialize(httpRequest);
+				// This allows the API to call (and avoid timing out on)
+				// functions that take up to 6 minutes to complete (the maximum
+				// allowed script run time), plus a little overhead.
+				httpRequest.setReadTimeout(380000);
+			}
+		};
 	}
 }

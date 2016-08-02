@@ -1,16 +1,20 @@
 package org.crf.models;
 
+import java.util.List;
+
 public class ScriptReturn {
 	
-	private Object data;
+	private List<String> data;
 	private String scriptId;
 	private String sheetId;
 	private String functionName;
+	private int nbLines;
+	private String error = null;
 	
-	public Object getData() {
+	public List<String> getData() {
 		return data;
 	}
-	public void setData(Object data) {
+	public void setData(List<String> data) {
 		this.data = data;
 	}
 	public String getScriptId() {
@@ -30,6 +34,18 @@ public class ScriptReturn {
 	}
 	public void setFunctionName(String functionName) {
 		this.functionName = functionName;
+	}
+	public int getNbLines() {
+		return nbLines;
+	}
+	public void setNbLines(int nbLines) {
+		this.nbLines = nbLines;
+	}
+	public String getError() {
+		return error;
+	}
+	public void setError(String error) {
+		this.error = error;
 	}
 
 }
