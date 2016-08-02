@@ -171,9 +171,10 @@ public class GSheetController {
 			if(sr.getError() != null){
 				return new ResponseEntity<List<Inscription>>(listreturn, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			GSheetService gsheet = new GSheetService(gconnecttoken);
-			listreturn = gsheet.getDataFromGetEmail(sr.getNbLines());
-		
+			if(sr.getNbLines() > 0){
+				GSheetService gsheet = new GSheetService(gconnecttoken);
+				listreturn = gsheet.getDataFromGetEmail(sr.getNbLines());
+			}
 		} catch (GoogleJsonResponseException gjre) {
 			gjre.printStackTrace();
 			return new ResponseEntity<List<Inscription>>(listreturn, HttpStatus.UNAUTHORIZED);
