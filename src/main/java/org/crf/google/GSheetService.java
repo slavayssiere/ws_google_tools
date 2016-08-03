@@ -230,6 +230,54 @@ public class GSheetService {
 		service.spreadsheets().batchUpdate(sheetid, batchUpdateRequest).execute();		
 	}
 	
+	public void addWaitingInscription(Inscription inscr) throws Exception {
+		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
+		
+		Sheets service = getSheetsService();
+		int row = 1;
+		
+		ValueRange response = null;
+		try {
+			response = service.spreadsheets().values().get(spreadsheetId, "PSC1 Nouvelle date" + "!A1:A1000")
+					.execute();
+		} catch (GoogleJsonResponseException gje) {
+			gje.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		List<List<Object>> valuesCell = response.getValues();
+		if (valuesCell == null || valuesCell.size() == 0) {
+			System.out.println("null no data");
+		} else {
+			row=valuesCell.size();
+		}
+		
+		List<Request> requests = new ArrayList<>();
+		List<CellData> values = new ArrayList<>();
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getTypeFormation())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(formaterSlash.format(inscr.getDateFormation()))));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getCivilite())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getPrenom())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getNom())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getDatenaissance())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getLieunaissance())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getAdresse())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getCodepostal())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getVille())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getPhone())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getEmail())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getMessage())));
+		
+		requests.add(new Request().setUpdateCells(
+				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(1356295922).setRowIndex(row).setColumnIndex(0))
+						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue")));
+
+		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
+
+		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();		
+	}
+	
 	public void addEmailNewDate(Inscription inscr) throws Exception {
 		Sheets service = getSheetsService();
 		String spreadsheetId = "1dgM6JG5GOc72B5a2ZdGlcIDYw9XPNV75cDB9h5e17vQ";

@@ -207,10 +207,7 @@ public class GSheetController {
 			gconnecttoken.setAccessToken(token);
 			gconnecttoken.authorize();
 			GSheetService gss = new GSheetService(gconnecttoken);
-			System.out.println("change sheet:" + sheetid);
-			System.out.println("add row:" + row);
 			gss.addInscription(sheetid, row, inscr);
-			System.out.println("done");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -235,7 +232,7 @@ public class GSheetController {
 			gconnecttoken.authorize();
 			GSheetService gss = new GSheetService(gconnecttoken);
 			gss.addEmailNewDate(inscr);
-			System.out.println("done");
+			gss.addWaitingInscription(inscr);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
