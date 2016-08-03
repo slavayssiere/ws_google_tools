@@ -102,26 +102,30 @@ public class GSheetController {
 	public ResponseEntity<Session> createNewSession(@RequestParam("token") String token, @RequestBody Session sess) {
 
 		Session getsession = null;
-		List<Session> sessionColl = new ArrayList<Session>();
 		GConnectToken gconnecttoken = new GConnectToken();
 		try {
 			gconnecttoken.setAccessToken(token);
 			gconnecttoken.authorize();
 			GDriveService gdriveserv = new GDriveService(gconnecttoken);
 			getsession = gdriveserv.copy("1TYxCseZaivEYMoWSPeYiF6zpLkKYPvDoY5t0aMWsMg0", sess);
+			if(getsession==null){
+				new ResponseEntity<Session>(getsession, HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 			GSheetService gss = new GSheetService(gconnecttoken);
 			gss.updateNewSheet(getsession);
 			GCalendarService gcs = new GCalendarService(gconnecttoken);
 			gcs.setNewSession(getsession);
+		} catch (GoogleJsonResponseException gjre){
+			new ResponseEntity<Session>(getsession, HttpStatus.UNAUTHORIZED);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			new ResponseEntity<Session>(getsession, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			new ResponseEntity<Session>(getsession, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
-		return new ResponseEntity<Session>(getsession, HttpStatus.OK);
+		return new ResponseEntity<Session>(getsession, HttpStatus.CREATED);
 	}
 
 	@RequestMapping(value = "/api/sheets/launchscript", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

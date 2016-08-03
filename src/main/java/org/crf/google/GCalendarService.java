@@ -62,8 +62,8 @@ public class GCalendarService {
         cal.add(java.util.Calendar.HOUR, 9);
         Date endDate = cal.getTime();
         
-        DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
-        DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
+        DateTime start = new DateTime(startDate, TimeZone.getTimeZone("Europe/Paris"));
+        DateTime end = new DateTime(endDate, TimeZone.getTimeZone("Europe/Paris"));
         
         event.setStart(new EventDateTime().setDateTime(start));
         event.setEnd(new EventDateTime().setDateTime(end));

@@ -10,6 +10,7 @@ import org.crf.models.FileDrive;
 import org.crf.models.Session;
 
 import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
@@ -60,14 +61,28 @@ public class GDriveService {
         return ret.values();
     }
 
-	public Session copy(String fileId, Session sess) throws Exception {
-		Drive service = getDriveService();
+	public Session copy(String fileId, Session sess) throws GoogleJsonResponseException {
+		Drive service;
+		try {
+			service = getDriveService();
+		} catch (GoogleJsonResponseException gjre) {
+			throw gjre;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 		String copyTitle = dt1.format(sess.getDate()) +  " " + sess.getType() + " " + sess.getFormateur();
 		File copiedFile = new File();
 	    copiedFile.setName(copyTitle);
 	    
-		File newfile = service.files().copy(fileId, copiedFile).execute();
+		File newfile;
+		try {
+			newfile = service.files().copy(fileId, copiedFile).execute();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 		sess.setGoogle_id(newfile.getId());
 		sess.setGoogle_name(copyTitle);

@@ -5,7 +5,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.crf.models.Inscription;
 import org.crf.models.Session;
@@ -14,18 +16,15 @@ import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
 import com.google.api.services.sheets.v4.model.CellData;
 import com.google.api.services.sheets.v4.model.CellFormat;
-import com.google.api.services.sheets.v4.model.Color;
 import com.google.api.services.sheets.v4.model.ExtendedValue;
 import com.google.api.services.sheets.v4.model.GridCoordinate;
+import com.google.api.services.sheets.v4.model.NumberFormat;
 import com.google.api.services.sheets.v4.model.Request;
 import com.google.api.services.sheets.v4.model.RowData;
-import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
-import com.google.common.util.concurrent.ExecutionList;
 
 public class GSheetService {
 
@@ -53,7 +52,8 @@ public class GSheetService {
 
 	SimpleDateFormat formaterHyphen = new SimpleDateFormat("dd-MM-yyyy");
 	SimpleDateFormat formaterSlash = new SimpleDateFormat("dd/MM/yyyy");
-
+	SimpleDateFormat formaterGSheet = new SimpleDateFormat("yyyy-MM-dd");
+	
 	public Session getState(String spreadsheetId, int id) throws Exception {
 		Sheets service = getSheetsService();
 		Session sess = new Session();
@@ -113,21 +113,36 @@ public class GSheetService {
 		}
 		return sess;
 	}
+	
+	// Precomputed difference between the Unix epoch and the Sheets epoch.
+	private final long SHEETS_EPOCH_DIFFERENCE = 2209161600000L;
+
+	
+	private double getEpochDate(Date inputDate)
+	{
+		long millisSinceUnixEpoch = inputDate.getTime();
+	    long millisSinceSheetsEpoch = millisSinceUnixEpoch + SHEETS_EPOCH_DIFFERENCE;
+	    return millisSinceSheetsEpoch / (double) TimeUnit.DAYS.toMillis(1);
+	}
 
 	public void updateNewSheet(Session sess) throws Exception {
 		Sheets service = getSheetsService();
+		
+		Double valDate = getEpochDate(sess.getDate());
 
 		List<Request> requests = new ArrayList<>();
 		List<CellData> values = new ArrayList<>();
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(sess.getType())));
 		values.add(new CellData()
-				.setUserEnteredValue(new ExtendedValue().setStringValue(this.formaterHyphen.format(sess.getDate()))));
+				.setUserEnteredValue(new ExtendedValue().setNumberValue(valDate))
+				.setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType("DATE"))));
 		values.add(new CellData()
 				.setUserEnteredValue(new ExtendedValue().setNumberValue(Double.valueOf(sess.getHeure()))));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(sess.getFormateur())));
+		
 		requests.add(new Request().setUpdateCells(
 				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(0).setColumnIndex(1))
-						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue")));
+						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue,userEnteredFormat.numberFormat")));
 
 		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 

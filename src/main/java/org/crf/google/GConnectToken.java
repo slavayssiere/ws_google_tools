@@ -14,6 +14,7 @@ import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -78,23 +79,54 @@ public class GConnectToken {
 //        }
         
         //AmazonS3 s3 = new AmazonS3Client(credentials);
+    	
         AmazonS3 s3 = new AmazonS3Client();
         Region euWest1 = Region.getRegion(Regions.EU_WEST_1);
         s3.setRegion(euWest1);
-        
-        return s3.getObject(new GetObjectRequest("static-private-file", "client_secret_oauth.json"));
-        
+        try
+        {
+        	return s3.getObject(new GetObjectRequest("static-private-file", "client_secret_oauth.json"));
+        }
+        catch(AmazonS3Exception ase){
+    		throw ase;
+    	}
+    }
+    
+    private GoogleClientSecrets getClientSecret(){
+    	
+    	boolean s3test = false;
+    	try
+    	{
+	    	this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+	                new InputStreamReader(getS3Data().getObjectContent()));
+	    	s3test = true;
+    	}
+    	catch(AmazonS3Exception ase){
+    		s3test = false;
+            
+    	} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			s3test = false;
+		}
+    	
+    	if(!s3test){
+    		try {
+				this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+				        new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    	}
+    	
+		return null;    	
     }
 
     public boolean token_create(String authCode, String redirectUri) throws Exception {
-        // load client secrets
-    	
-        //clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-        //    new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
         
-        clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-            new InputStreamReader(getS3Data().getObjectContent()));
-
+    	getClientSecret();
+    	
         // set up authorization code flow
         GoogleTokenResponse tokenResponse =  
                 new GoogleAuthorizationCodeTokenRequest(  
@@ -126,12 +158,9 @@ public class GConnectToken {
      */
     public Credential authorize() throws Exception {
         // load client secrets
-    	//clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-        //        new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
+
+    	getClientSecret();
     	
-        clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-            new InputStreamReader(getS3Data().getObjectContent()));
-        
         // authorize        
         GoogleCredential credential = new GoogleCredential.Builder()  
                 .setTransport(new NetHttpTransport())  
