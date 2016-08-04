@@ -102,10 +102,19 @@ public class GDriveService {
 	        .setPageSize(1000)
 	        .execute();
         
-        File file = result.getFiles().get(0);
-    	FileDrive fd = new FileDrive();
-    	fd.setId(file.getId());
-    	fd.setName(file.getName());    
+        System.out.println(result.getFiles());
+        
+        FileDrive fd = null;
+        for(File file : result.getFiles()){
+        	fd = new FileDrive();
+        	if(file.getName().contains(titleFile)){
+	        	fd.setId(file.getId());
+	        	fd.setName(file.getName());
+	        	break;
+        	}
+        }
+        
+           
         	        
         return fd;
 	}
