@@ -1,22 +1,24 @@
-package org.crf.google;
+package org.crf.ws.services;
 
 import java.util.Date;
 import java.util.TimeZone;
 
+import org.crf.google.GConnectToken;
 import org.crf.models.Session;
+import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.google.api.services.oauth2.Oauth2;
-import com.google.api.services.oauth2.model.Userinfoplus;
 
-public class GCalendarService {
-	GConnectToken gct;
+@Service
+public class CalendarServiceBean implements CalendarService {
+	private GConnectToken gct;
 
-    public GCalendarService(GConnectToken newgct) {
+	@Override
+    public void setToken(GConnectToken newgct){
         gct = newgct;
     }
     
@@ -27,7 +29,11 @@ public class GCalendarService {
         		.build();
     }
     
-    public Event create(Session sess) throws Exception {
+    /* (non-Javadoc)
+	 * @see org.crf.google.CalendarService#create(org.crf.models.Session)
+	 */
+    @Override
+	public Event create(Session sess) throws Exception {
     	Calendar service = getCalendarService();
     	String calendarPSC1 = "udk2esse0hsos1ho8a7ukng43s@group.calendar.google.com";
     	String calendarIPSEN = "os1qv8all2n00vg5l80qu0brog@group.calendar.google.com";

@@ -1,4 +1,4 @@
-package org.crf.google;
+package org.crf.ws.services;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -9,8 +9,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.crf.google.GConnectToken;
 import org.crf.models.Inscription;
 import org.crf.models.Session;
+import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -28,7 +30,8 @@ import com.google.api.services.sheets.v4.model.RowData;
 import com.google.api.services.sheets.v4.model.UpdateCellsRequest;
 import com.google.api.services.sheets.v4.model.ValueRange;
 
-public class GSheetService {
+@Service
+public class SheetServiceBean implements SheetService {
 
 	private GConnectToken gct;
 
@@ -39,11 +42,14 @@ public class GSheetService {
 	// Precomputed difference between the Unix epoch and the Sheets epoch.
 	private final long SHEETS_EPOCH_DIFFERENCE = 2209161600000L;
 
-	
-	public GSheetService(GConnectToken newgct) {
-		gct = newgct;
-	}
-
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#setToken(org.crf.google.GConnectToken)
+	 */
+	@Override
+	public void setToken(GConnectToken newgct){
+        gct = newgct;
+    }  
+    
 	/**
 	 * Build and return an authorized Sheets API client service.
 	 * 
@@ -56,6 +62,10 @@ public class GSheetService {
 				.setApplicationName(gct.getAPPLICATION_NAME()).build();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#getState(java.lang.String, int)
+	 */
+	@Override
 	public Session getState(String spreadsheetId, int id) throws Exception {
 		Sheets service = getSheetsService();
 		Session sess = new Session();
@@ -85,8 +95,14 @@ public class GSheetService {
 					try {
 						sess.setDate(formaterHyphen.parse((String) row.get(2)));
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
-						sess.setDate(formaterSlash.parse((String) row.get(2)));
+						try
+						{
+							sess.setDate(formaterSlash.parse((String) row.get(2)));
+						}
+						catch(ParseException pe){
+							Date date = new Date((long) row.get(2));
+							sess.setDate(date);
+						}
 					}
 					sess.setType((String) row.get(1));
 					sess.setId(id);
@@ -123,6 +139,10 @@ public class GSheetService {
 	    return millisSinceSheetsEpoch / (double) TimeUnit.DAYS.toMillis(1);
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#update(org.crf.models.Session)
+	 */
+	@Override
 	public void update(Session sess) throws Exception {
 		Sheets service = getSheetsService();
 		
@@ -147,6 +167,10 @@ public class GSheetService {
 		service.spreadsheets().batchUpdate(sess.getGoogle_id(), batchUpdateRequest).execute();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#getDataFromGetEmail()
+	 */
+	@Override
 	public List<Inscription> getDataFromGetEmail() throws Exception {
 		List<Inscription> listEmails = new ArrayList<Inscription>();
 		Sheets service = getSheetsService();
@@ -207,6 +231,10 @@ public class GSheetService {
 		return listEmails;
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#deleteRow(int)
+	 */
+	@Override
 	public boolean deleteRow(int numRow) throws Exception {
 		Sheets service = getSheetsService();
 		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
@@ -226,6 +254,10 @@ public class GSheetService {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#addInscription(java.lang.String, int, org.crf.models.Inscription)
+	 */
+	@Override
 	public void addInscription(String sheetid, int row, Inscription inscr) throws Exception {
 		Sheets service = getSheetsService();
 
@@ -252,6 +284,10 @@ public class GSheetService {
 		service.spreadsheets().batchUpdate(sheetid, batchUpdateRequest).execute();		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#addWaitingInscription(org.crf.models.Inscription)
+	 */
+	@Override
 	public void addWaitingInscription(Inscription inscr) throws Exception {
 		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
 		
@@ -300,6 +336,10 @@ public class GSheetService {
 		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();		
 	}
 	
+	/* (non-Javadoc)
+	 * @see org.crf.google.SheetService#addEmailNewDate(org.crf.models.Inscription)
+	 */
+	@Override
 	public void addEmailNewDate(Inscription inscr) throws Exception {
 		Sheets service = getSheetsService();
 		String spreadsheetId = "1dgM6JG5GOc72B5a2ZdGlcIDYw9XPNV75cDB9h5e17vQ";

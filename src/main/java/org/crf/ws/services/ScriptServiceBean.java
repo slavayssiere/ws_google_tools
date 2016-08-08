@@ -1,4 +1,4 @@
-package org.crf.google;
+package org.crf.ws.services;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -7,27 +7,38 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.crf.google.GConnectToken;
 import org.crf.models.ScriptData;
+import org.springframework.stereotype.Service;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.script.Script;
 import com.google.api.services.script.model.ExecutionRequest;
 import com.google.api.services.script.model.Operation;
 
-public class GScriptService {
+@Service
+public class ScriptServiceBean implements ScriptService {
 	GConnectToken gct;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
-	public GScriptService(GConnectToken newgct) {
-		gct = newgct;
-	}
-
+    /* (non-Javadoc)
+	 * @see org.crf.google.ScriptService#setToken(org.crf.google.GConnectToken)
+	 */
+    @Override
+	public void setToken(GConnectToken newgct){
+        gct = newgct;
+    }
 	private Script getScriptService() throws Exception {
 		Credential credential = gct.authorize();
 		return new Script.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), GConnectToken.setHttpTimeout(credential))
 				.setApplicationName(gct.getAPPLICATION_NAME()).build();
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.ScriptService#execute(org.crf.models.ScriptData)
+	 */
+	@Override
 	public ScriptData execute(ScriptData sr) throws GoogleJsonResponseException {
 		Script service;
 		try {

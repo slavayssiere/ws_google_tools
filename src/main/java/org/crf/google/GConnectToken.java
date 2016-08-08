@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
 
+import org.crf.ws.services.SheetServiceBean;
+
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
@@ -100,7 +102,7 @@ public class GConnectToken {
     	if(!s3test){
     		try {
 				this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-				        new InputStreamReader(GSheetService.class.getResourceAsStream("/client_secret_oauth.json")));
+				        new InputStreamReader(SheetServiceBean.class.getResourceAsStream("/client_secret_oauth.json")));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -129,11 +131,6 @@ public class GConnectToken {
         accessToken = tokenResponse.getAccessToken();  
         refreshToken = tokenResponse.getRefreshToken();  
         expiresInSeconds = tokenResponse.getExpiresInSeconds(); 
-        
-        System.out.println("accessToken:" + accessToken);
-        System.out.println("refreshToken:" + refreshToken);
-        System.out.println("expiresInSeconds:" + expiresInSeconds);
-        
         
         return true;
       }

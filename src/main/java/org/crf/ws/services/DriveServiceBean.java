@@ -1,4 +1,4 @@
-package org.crf.google;
+package org.crf.ws.services;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.crf.google.GConnectToken;
 import org.crf.models.FileDrive;
 import org.crf.models.Session;
+import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
@@ -15,13 +17,15 @@ import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 import com.google.api.services.drive.model.FileList;
 
-public class GDriveService {
+@Service
+public class DriveServiceBean implements DriveService {
 	GConnectToken gct;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
-    public GDriveService(GConnectToken newgct) {
+	@Override
+    public void setToken(GConnectToken newgct){
         gct = newgct;
-    }    
+    }  
     
     private Drive getDriveService() throws Exception {
         Credential credential = gct.authorize();
@@ -30,7 +34,11 @@ public class GDriveService {
                 .build();
     }
 
-    public Collection<FileDrive> findAll() throws Exception {
+    /* (non-Javadoc)
+	 * @see org.crf.google.DriveService#findAll()
+	 */
+    @Override
+	public Collection<FileDrive> findAll() throws Exception {
         // Build a new authorized API client service.
         Drive service = getDriveService();
 
@@ -53,6 +61,10 @@ public class GDriveService {
         return ret.values();
     }
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.DriveService#copy(java.lang.String, org.crf.models.Session)
+	 */
+	@Override
 	public Session copy(String fileId, Session sess) throws GoogleJsonResponseException {
 		Drive service;
 		try {
@@ -82,6 +94,10 @@ public class GDriveService {
 		return sess;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.DriveService#findOne(java.lang.String)
+	 */
+	@Override
 	public FileDrive findOne(String titleFile) throws Exception {
 		Drive service = getDriveService();
 

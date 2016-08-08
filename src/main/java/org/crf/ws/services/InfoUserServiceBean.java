@@ -1,35 +1,43 @@
-package org.crf.google;
+package org.crf.ws.services;
+
+import org.crf.google.GConnectToken;
+import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.services.oauth2.Oauth2;
 import com.google.api.services.oauth2.Oauth2.Userinfo;
 import com.google.api.services.oauth2.model.Userinfoplus;
 
-public class GUserInfo {
+@Service
+public class InfoUserServiceBean implements InfoUserService {
 	GConnectToken gct;
 
-    /** Constructor
-     * 
-     */
-    public GUserInfo(GConnectToken newgct) {
+
+    /* (non-Javadoc)
+	 * @see org.crf.google.UserInfo#setToken(org.crf.google.GConnectToken)
+	 */
+    @Override
+	public void setToken(GConnectToken newgct){
         gct = newgct;
     }
-
-    
     
     /**
      * Build and return an authorized Sheets API client service.
      * @return an authorized Sheets API client service
      * @throws Exception 
      */
-    public Oauth2 getOauth2Service() throws Exception {
+    private Oauth2 getOauth2Service() throws Exception {
         Credential credential = gct.authorize();
         return new Oauth2.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), credential)
         		.setApplicationName(gct.getAPPLICATION_NAME())
         		.build();
     }
     
-    public String getUserEmail() {
+    /* (non-Javadoc)
+	 * @see org.crf.google.UserInfo#getUserEmail()
+	 */
+    @Override
+	public String getUserEmail() {
     	Oauth2 service = null;
     	Userinfoplus uinfo = null;
 		try {
