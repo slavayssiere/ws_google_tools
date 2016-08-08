@@ -2,7 +2,7 @@ package org.crf.models;
 
 import java.util.List;
 
-public class ScriptReturn {
+public class ScriptData {
 	
 	private List<String> data;
 	private String scriptId;

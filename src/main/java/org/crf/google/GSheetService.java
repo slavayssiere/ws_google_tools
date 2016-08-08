@@ -18,6 +18,8 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
 import com.google.api.services.sheets.v4.model.CellData;
 import com.google.api.services.sheets.v4.model.CellFormat;
+import com.google.api.services.sheets.v4.model.DeleteDimensionRequest;
+import com.google.api.services.sheets.v4.model.DimensionRange;
 import com.google.api.services.sheets.v4.model.ExtendedValue;
 import com.google.api.services.sheets.v4.model.GridCoordinate;
 import com.google.api.services.sheets.v4.model.NumberFormat;
@@ -28,12 +30,16 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 
 public class GSheetService {
 
-	GConnectToken gct;
+	private GConnectToken gct;
 
-	/**
-	 * Constructor
-	 * 
-	 */
+	private SimpleDateFormat formaterHyphen = new SimpleDateFormat("dd-MM-yyyy");
+	private SimpleDateFormat formaterSlash = new SimpleDateFormat("dd/MM/yyyy");
+	private SimpleDateFormat formaterGSheet = new SimpleDateFormat("yyyy-MM-dd");
+
+	// Precomputed difference between the Unix epoch and the Sheets epoch.
+	private final long SHEETS_EPOCH_DIFFERENCE = 2209161600000L;
+
+	
 	public GSheetService(GConnectToken newgct) {
 		gct = newgct;
 	}
@@ -50,10 +56,6 @@ public class GSheetService {
 				.setApplicationName(gct.getAPPLICATION_NAME()).build();
 	}
 
-	SimpleDateFormat formaterHyphen = new SimpleDateFormat("dd-MM-yyyy");
-	SimpleDateFormat formaterSlash = new SimpleDateFormat("dd/MM/yyyy");
-	SimpleDateFormat formaterGSheet = new SimpleDateFormat("yyyy-MM-dd");
-	
 	public Session getState(String spreadsheetId, int id) throws Exception {
 		Sheets service = getSheetsService();
 		Session sess = new Session();
@@ -113,11 +115,7 @@ public class GSheetService {
 		}
 		return sess;
 	}
-	
-	// Precomputed difference between the Unix epoch and the Sheets epoch.
-	private final long SHEETS_EPOCH_DIFFERENCE = 2209161600000L;
-
-	
+		
 	private double getEpochDate(Date inputDate)
 	{
 		long millisSinceUnixEpoch = inputDate.getTime();
@@ -125,7 +123,7 @@ public class GSheetService {
 	    return millisSinceSheetsEpoch / (double) TimeUnit.DAYS.toMillis(1);
 	}
 
-	public void updateNewSheet(Session sess) throws Exception {
+	public void update(Session sess) throws Exception {
 		Sheets service = getSheetsService();
 		
 		Double valDate = getEpochDate(sess.getDate());
@@ -149,14 +147,14 @@ public class GSheetService {
 		service.spreadsheets().batchUpdate(sess.getGoogle_id(), batchUpdateRequest).execute();
 	}
 
-	public List<Inscription> getDataFromGetEmail(int nombreInscrit) throws Exception {
+	public List<Inscription> getDataFromGetEmail() throws Exception {
 		List<Inscription> listEmails = new ArrayList<Inscription>();
 		Sheets service = getSheetsService();
 		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
 
 		ValueRange response;
 		try {
-			response = service.spreadsheets().values().get(spreadsheetId, "getEmails!A2:M" + (nombreInscrit + 1))
+			response = service.spreadsheets().values().get(spreadsheetId, "getEmails!A2:M200")
 					.execute();
 		} catch (GoogleJsonResponseException gje) {
 			// gje.printStackTrace();
@@ -172,6 +170,7 @@ public class GSheetService {
 			System.out.println("null no data");
 			return null;
 		} else {
+			int numRow = 2;
 			for (List row : values) {
 				try {
 
@@ -189,8 +188,12 @@ public class GSheetService {
 					insc.setPhone((String) row.get(10));
 					insc.setEmail((String) row.get(11));
 					insc.setMessage((String) row.get(12));
+					
+					insc.setRow(numRow);
+					numRow++;
 
 					listEmails.add(insc);
+					
 				} catch (IndexOutOfBoundsException iob) {
 					System.out.println("error " + row.toString());
 					iob.printStackTrace();
@@ -202,6 +205,25 @@ public class GSheetService {
 			}
 		}
 		return listEmails;
+	}
+	
+	public boolean deleteRow(int numRow) throws Exception {
+		Sheets service = getSheetsService();
+		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
+
+		List<Request> requests = new ArrayList<>();
+		
+		try
+		{
+			requests.add(new Request().setDeleteDimension(new DeleteDimensionRequest().setRange(new DimensionRange().setSheetId(0).setDimension("ROWS").setStartIndex(numRow-1).setEndIndex(numRow))));
+			
+			BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
+			service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();	
+		}
+		catch(Exception e){
+			return false;
+		}
+		return true;
 	}
 
 	public void addInscription(String sheetid, int row, Inscription inscr) throws Exception {

@@ -16,28 +16,18 @@ import com.google.api.services.oauth2.model.Userinfoplus;
 public class GCalendarService {
 	GConnectToken gct;
 
-    /** Constructor
-     * 
-     */
     public GCalendarService(GConnectToken newgct) {
         gct = newgct;
     }
-
     
-    
-    /**
-     * Build and return an authorized Sheets API client service.
-     * @return an authorized Sheets API client service
-     * @throws Exception 
-     */
-    public Calendar getCalendarService() throws Exception {
+    private Calendar getCalendarService() throws Exception {
         Credential credential = gct.authorize();
         return new Calendar.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), credential)
         		.setApplicationName(gct.getAPPLICATION_NAME())
         		.build();
     }
     
-    public Event setNewSession(Session sess) throws Exception {
+    public Event create(Session sess) throws Exception {
     	Calendar service = getCalendarService();
     	String calendarPSC1 = "udk2esse0hsos1ho8a7ukng43s@group.calendar.google.com";
     	String calendarIPSEN = "os1qv8all2n00vg5l80qu0brog@group.calendar.google.com";

@@ -19,26 +19,18 @@ public class GDriveService {
 	GConnectToken gct;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
-    /** Constructor
-     * 
-     */
     public GDriveService(GConnectToken newgct) {
         gct = newgct;
     }    
     
-    /**
-     * Build and return an authorized Sheets API client service.
-     * @return an authorized Sheets API client service
-     * @throws Exception 
-     */
-    public Drive getDriveService() throws Exception {
+    private Drive getDriveService() throws Exception {
         Credential credential = gct.authorize();
         return new Drive.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), credential)
                 .setApplicationName(gct.getAPPLICATION_NAME())
                 .build();
     }
 
-    public Collection<FileDrive> getListSheet() throws Exception {
+    public Collection<FileDrive> findAll() throws Exception {
         // Build a new authorized API client service.
         Drive service = getDriveService();
 
@@ -90,7 +82,7 @@ public class GDriveService {
 		return sess;
 	}
 
-	public FileDrive getSheetByName(String titleFile) throws Exception {
+	public FileDrive findOne(String titleFile) throws Exception {
 		Drive service = getDriveService();
 
         Map<String, FileDrive> ret = new HashMap<String, FileDrive>();   

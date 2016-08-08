@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.crf.models.ScriptReturn;
+import org.crf.models.ScriptData;
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.script.Script;
@@ -18,27 +18,17 @@ public class GScriptService {
 	GConnectToken gct;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
-	/**
-	 * Constructor
-	 * 
-	 */
 	public GScriptService(GConnectToken newgct) {
 		gct = newgct;
 	}
 
-	/**
-	 * Build and return an authorized Sheets API client service.
-	 * 
-	 * @return an authorized Sheets API client service
-	 * @throws Exception
-	 */
 	private Script getScriptService() throws Exception {
 		Credential credential = gct.authorize();
 		return new Script.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), GConnectToken.setHttpTimeout(credential))
 				.setApplicationName(gct.getAPPLICATION_NAME()).build();
 	}
 
-	public ScriptReturn activateScript(ScriptReturn sr) throws GoogleJsonResponseException {
+	public ScriptData execute(ScriptData sr) throws GoogleJsonResponseException {
 		Script service;
 		try {
 			service = getScriptService();
@@ -95,7 +85,7 @@ public class GScriptService {
 	 *            op the Operation returning an error response
 	 * @return summary of error response, or null if Operation returned no error
 	 */
-	private static String getScriptError(Operation op) {
+	private String getScriptError(Operation op) {
 		if (op.getError() == null) {
 			return null;
 		}
@@ -127,5 +117,4 @@ public class GScriptService {
 		return sb.toString();
 	}
 
-	
 }

@@ -17,6 +17,8 @@ public class Inscription {
 	private String phone;
 	private String email;
 	
+	private int row;
+	
 	private String typeFormation;
 	private Date dateFormation;
 	
@@ -111,5 +113,11 @@ public class Inscription {
 	}
 	public void setMessage(String message) {
 		this.message = message;
+	}
+	public int getRow() {
+		return row;
+	}
+	public void setRow(int row) {
+		this.row = row;
 	}
 }

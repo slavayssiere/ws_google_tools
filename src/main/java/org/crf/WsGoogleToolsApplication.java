@@ -32,6 +32,7 @@ public class WsGoogleToolsApplication {
                 registry.addMapping("/api/sheets/getemails").allowedOrigins(url, url2);
                 registry.addMapping("/api/sheets/inscription/{sheetid}/{row}").allowedOrigins(url, url2);
                 registry.addMapping("/api/sheets/complete").allowedOrigins(url, url2);
+                registry.addMapping("/api/sheets/getemails/{row}").allowedOrigins("*").allowedMethods("DELETE");
             }
         };
     }
