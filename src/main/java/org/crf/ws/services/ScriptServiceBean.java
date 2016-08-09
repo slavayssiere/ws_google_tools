@@ -49,13 +49,10 @@ public class ScriptServiceBean implements ScriptService {
 			return sr;
 		}
 
-		List<Object> params = new ArrayList<Object>();
-		params.add(sr.getSheetId());
-
 		// Create an execution request object.
 		ExecutionRequest request = new ExecutionRequest()
 				.setFunction(sr.getFunctionName())
-				.setParameters(params)
+				.setParameters(new ArrayList<Object>(sr.getListArguments()))
 				.setDevMode(true);
 		Operation op = null;
 		

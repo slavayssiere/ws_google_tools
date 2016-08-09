@@ -1,5 +1,6 @@
 package org.crf.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ScriptData {
@@ -10,6 +11,8 @@ public class ScriptData {
 	private String functionName;
 	private int nbLines;
 	private String error = null;
+	
+	private List<String> listArguments;
 	
 	public List<String> getData() {
 		return data;
@@ -46,6 +49,19 @@ public class ScriptData {
 	}
 	public void setError(String error) {
 		this.error = error;
+	}
+	public List<String> getListArguments() {
+		return listArguments;
+	}
+	public void setListArguments(List<String> listArguments) {
+		this.listArguments = listArguments;
+	}
+	public void setNewArguments(String sheetid2) {
+		if(this.listArguments == null){
+			this.listArguments = new ArrayList<String>();
+		}
+		
+		this.listArguments.add(sheetid2);		
 	}
 
 }

@@ -60,7 +60,6 @@ public class GetEmailsController {
 		return new ResponseEntity<ScriptData>(sr, HttpStatus.OK);
 	}
 
-	//
 	@RequestMapping(value = "/api/sheets/getemails", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<List<Inscription>> launchScriptGetEmails(@RequestParam("token") String token) {
 
@@ -75,6 +74,7 @@ public class GetEmailsController {
 			sr.setFunctionName("listEmails");
 			sr.setScriptId("MHr4dqf9ZmBeO9uaeqW8lPF8Gg9vJhx0I");
 			sr.setSheetId("1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE");
+			sr.setNewArguments("blabla");
 			sr = scriptService.execute(sr); // scriptid,sheetid
 			System.out.println(sr);
 			if (sr.getError() != null) {
@@ -158,6 +158,35 @@ public class GetEmailsController {
 		}
 
 		return new ResponseEntity<Boolean>(ret, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/api/sheets/{sheetid}/sendinscrits", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> launchScriptEmailsInscrit(@RequestParam("token") String token, @PathVariable("sheetid") String sheetid) {
+
+		ScriptData sr = new ScriptData();
+
+		GConnectToken gconnecttoken = new GConnectToken();
+		try {
+			gconnecttoken.setAccessToken(token);
+			gconnecttoken.authorize();
+			scriptService.setToken(gconnecttoken);
+			sr.setFunctionName("sendInscrit");
+			sr.setScriptId("M1iqHwQ-j7dDT1NrEe_AKQvuRtcQ09sPP");
+			sr.setSheetId("1p3KhsRyutUGy75DHygK_yfrUteW8bIyfQ9BIrd00XB8");
+			sr.setNewArguments(sheetid);
+			sr = scriptService.execute(sr); // scriptid,sheetid			
+		} catch (GoogleJsonResponseException gjre) {
+			gjre.printStackTrace();
+			return new ResponseEntity<Boolean>(false, HttpStatus.UNAUTHORIZED);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
 }
