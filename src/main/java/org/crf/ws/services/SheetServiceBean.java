@@ -42,14 +42,18 @@ public class SheetServiceBean implements SheetService {
 	// Precomputed difference between the Unix epoch and the Sheets epoch.
 	private final long SHEETS_EPOCH_DIFFERENCE = 2209161600000L;
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.crf.google.SheetService#setToken(org.crf.google.GConnectToken)
 	 */
 	@Override
-	public void setToken(GConnectToken newgct){
-        gct = newgct;
-    }  
-    
+	public void setToken(GConnectToken newgct) {
+		gct = newgct;
+	}
+
+	private Sheets sheetsService = null;
+
 	/**
 	 * Build and return an authorized Sheets API client service.
 	 * 
@@ -57,12 +61,19 @@ public class SheetServiceBean implements SheetService {
 	 * @throws Exception
 	 */
 	private Sheets getSheetsService() throws Exception {
-		Credential credential = gct.authorize();
-		return new Sheets.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), credential)
-				.setApplicationName(gct.getAPPLICATION_NAME()).build();
+		if (this.sheetsService == null) {
+			Credential credential = gct.authorize();
+			return new Sheets.Builder(gct.getHTTP_TRANSPORT(), gct.getJSON_FACTORY(), credential)
+					.setApplicationName(gct.getAPPLICATION_NAME()).build();
+		}
+		else {
+			return this.sheetsService;
+		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.crf.google.SheetService#getState(java.lang.String, int)
 	 */
 	@Override
@@ -73,7 +84,7 @@ public class SheetServiceBean implements SheetService {
 		ValueRange response;
 		try {
 			response = service.spreadsheets().values().get(spreadsheetId, "Admin!A1:F18")
-					// .setFields("properties/title,sheets/data/rowData/values/formattedValue")
+					//.setFields("sheets/data/rowData/values/formattedValue")
 					.execute();
 		} catch (GoogleJsonResponseException gje) {
 			// gje.printStackTrace();
@@ -83,6 +94,7 @@ public class SheetServiceBean implements SheetService {
 			e.printStackTrace();
 			return null;
 		}
+
 		List<List<Object>> values = response.getValues();
 		if (values == null || values.size() == 0) {
 			System.out.println("null no data");
@@ -95,11 +107,9 @@ public class SheetServiceBean implements SheetService {
 					try {
 						sess.setDate(formaterHyphen.parse((String) row.get(2)));
 					} catch (ParseException e) {
-						try
-						{
+						try {
 							sess.setDate(formaterSlash.parse((String) row.get(2)));
-						}
-						catch(ParseException pe){
+						} catch (ParseException pe) {
 							Date date = new Date((long) row.get(2));
 							sess.setDate(date);
 						}
@@ -129,45 +139,49 @@ public class SheetServiceBean implements SheetService {
 				nbrow++;
 			}
 		}
+
 		return sess;
 	}
-		
-	private double getEpochDate(Date inputDate)
-	{
+
+	private double getEpochDate(Date inputDate) {
 		long millisSinceUnixEpoch = inputDate.getTime();
-	    long millisSinceSheetsEpoch = millisSinceUnixEpoch + SHEETS_EPOCH_DIFFERENCE;
-	    return millisSinceSheetsEpoch / (double) TimeUnit.DAYS.toMillis(1);
+		long millisSinceSheetsEpoch = millisSinceUnixEpoch + SHEETS_EPOCH_DIFFERENCE;
+		return millisSinceSheetsEpoch / (double) TimeUnit.DAYS.toMillis(1);
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.crf.google.SheetService#update(org.crf.models.Session)
 	 */
 	@Override
 	public void update(Session sess) throws Exception {
 		Sheets service = getSheetsService();
-		
+
 		Double valDate = getEpochDate(sess.getDate());
 
 		List<Request> requests = new ArrayList<>();
 		List<CellData> values = new ArrayList<>();
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(sess.getType())));
-		values.add(new CellData()
-				.setUserEnteredValue(new ExtendedValue().setNumberValue(valDate))
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setNumberValue(valDate))
 				.setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType("DATE"))));
 		values.add(new CellData()
 				.setUserEnteredValue(new ExtendedValue().setNumberValue(Double.valueOf(sess.getHeure()))));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(sess.getFormateur())));
-		
+
 		requests.add(new Request().setUpdateCells(
 				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(0).setColumnIndex(1))
-						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue,userEnteredFormat.numberFormat")));
+						.setRows(Arrays.asList(new RowData().setValues(values)))
+						.setFields("userEnteredValue,userEnteredFormat.numberFormat")));
 
 		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 
 		service.spreadsheets().batchUpdate(sess.getGoogle_id(), batchUpdateRequest).execute();
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.crf.google.SheetService#getDataFromGetEmail()
 	 */
 	@Override
@@ -178,8 +192,7 @@ public class SheetServiceBean implements SheetService {
 
 		ValueRange response;
 		try {
-			response = service.spreadsheets().values().get(spreadsheetId, "getEmails!A2:M200")
-					.execute();
+			response = service.spreadsheets().values().get(spreadsheetId, "getEmails!A2:M200").execute();
 		} catch (GoogleJsonResponseException gje) {
 			// gje.printStackTrace();
 			return null;
@@ -212,12 +225,12 @@ public class SheetServiceBean implements SheetService {
 					insc.setPhone((String) row.get(10));
 					insc.setEmail((String) row.get(11));
 					insc.setMessage((String) row.get(12));
-					
+
 					insc.setRow(numRow);
 					numRow++;
 
 					listEmails.add(insc);
-					
+
 				} catch (IndexOutOfBoundsException iob) {
 					System.out.println("error " + row.toString());
 					iob.printStackTrace();
@@ -225,13 +238,15 @@ public class SheetServiceBean implements SheetService {
 					System.out.println("error " + row.toString());
 					pe.printStackTrace();
 				}
-			
+
 			}
 		}
 		return listEmails;
 	}
-	
-	/* (non-Javadoc)
+
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see org.crf.google.SheetService#deleteRow(int)
 	 */
 	@Override
@@ -240,22 +255,25 @@ public class SheetServiceBean implements SheetService {
 		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
 
 		List<Request> requests = new ArrayList<>();
-		
-		try
-		{
-			requests.add(new Request().setDeleteDimension(new DeleteDimensionRequest().setRange(new DimensionRange().setSheetId(0).setDimension("ROWS").setStartIndex(numRow-1).setEndIndex(numRow))));
-			
-			BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
-			service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();	
-		}
-		catch(Exception e){
+
+		try {
+			requests.add(new Request().setDeleteDimension(new DeleteDimensionRequest().setRange(new DimensionRange()
+					.setSheetId(0).setDimension("ROWS").setStartIndex(numRow - 1).setEndIndex(numRow))));
+
+			BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest()
+					.setRequests(requests);
+			service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
+		} catch (Exception e) {
 			return false;
 		}
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.crf.google.SheetService#addInscription(java.lang.String, int, org.crf.models.Inscription)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.crf.google.SheetService#addInscription(java.lang.String, int,
+	 * org.crf.models.Inscription)
 	 */
 	@Override
 	public void addInscription(String sheetid, int row, Inscription inscr) throws Exception {
@@ -274,30 +292,32 @@ public class SheetServiceBean implements SheetService {
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getPhone())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getEmail())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getMessage())));
-		
+
 		requests.add(new Request().setUpdateCells(
 				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(row).setColumnIndex(3))
 						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue")));
 
 		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 
-		service.spreadsheets().batchUpdate(sheetid, batchUpdateRequest).execute();		
+		service.spreadsheets().batchUpdate(sheetid, batchUpdateRequest).execute();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.crf.google.SheetService#addWaitingInscription(org.crf.models.Inscription)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.crf.google.SheetService#addWaitingInscription(org.crf.models.
+	 * Inscription)
 	 */
 	@Override
 	public void addWaitingInscription(Inscription inscr) throws Exception {
 		String spreadsheetId = "1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE";
-		
+
 		Sheets service = getSheetsService();
 		int row = 1;
-		
+
 		ValueRange response = null;
 		try {
-			response = service.spreadsheets().values().get(spreadsheetId, "PSC1 Nouvelle date" + "!A1:A1000")
-					.execute();
+			response = service.spreadsheets().values().get(spreadsheetId, "PSC1 Nouvelle date" + "!A1:A1000").execute();
 		} catch (GoogleJsonResponseException gje) {
 			gje.printStackTrace();
 		} catch (IOException e) {
@@ -308,13 +328,14 @@ public class SheetServiceBean implements SheetService {
 		if (valuesCell == null || valuesCell.size() == 0) {
 			System.out.println("null no data");
 		} else {
-			row=valuesCell.size();
+			row = valuesCell.size();
 		}
-		
+
 		List<Request> requests = new ArrayList<>();
 		List<CellData> values = new ArrayList<>();
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getTypeFormation())));
-		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(formaterSlash.format(inscr.getDateFormation()))));
+		values.add(new CellData().setUserEnteredValue(
+				new ExtendedValue().setStringValue(formaterSlash.format(inscr.getDateFormation()))));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getCivilite())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getPrenom())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getNom())));
@@ -326,18 +347,21 @@ public class SheetServiceBean implements SheetService {
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getPhone())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getEmail())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getMessage())));
-		
-		requests.add(new Request().setUpdateCells(
-				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(1356295922).setRowIndex(row).setColumnIndex(0))
-						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue")));
+
+		requests.add(new Request().setUpdateCells(new UpdateCellsRequest()
+				.setStart(new GridCoordinate().setSheetId(1356295922).setRowIndex(row).setColumnIndex(0))
+				.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue")));
 
 		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 
-		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();		
+		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
 	}
-	
-	/* (non-Javadoc)
-	 * @see org.crf.google.SheetService#addEmailNewDate(org.crf.models.Inscription)
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.crf.google.SheetService#addEmailNewDate(org.crf.models.Inscription)
 	 */
 	@Override
 	public void addEmailNewDate(Inscription inscr) throws Exception {
@@ -346,21 +370,19 @@ public class SheetServiceBean implements SheetService {
 		List<Request> requests = new ArrayList<>();
 		List<CellData> values = new ArrayList<>();
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getEmail())));
-		
+
 		String sheetName = "";
-		if(inscr.getTypeFormation().equals("PSC1")){
+		if (inscr.getTypeFormation().equals("PSC1")) {
 			sheetName = "PSC1complet";
-		}
-		else{
+		} else {
 			sheetName = "IPSENcomplet";
 		}
-		
+
 		int row = 1;
-		
+
 		ValueRange response = null;
 		try {
-			response = service.spreadsheets().values().get(spreadsheetId, sheetName + "!A1:A60")
-					.execute();
+			response = service.spreadsheets().values().get(spreadsheetId, sheetName + "!A1:A60").execute();
 		} catch (GoogleJsonResponseException gje) {
 			gje.printStackTrace();
 		} catch (IOException e) {
@@ -371,15 +393,15 @@ public class SheetServiceBean implements SheetService {
 		if (valuesCell == null || valuesCell.size() == 0) {
 			System.out.println("null no data");
 		} else {
-			row=valuesCell.size();
+			row = valuesCell.size();
 		}
-		
+
 		requests.add(new Request().setUpdateCells(
 				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(row).setColumnIndex(0))
 						.setRows(Arrays.asList(new RowData().setValues(values))).setFields("userEnteredValue")));
 
 		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 
-		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();		
+		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
 	}
 }

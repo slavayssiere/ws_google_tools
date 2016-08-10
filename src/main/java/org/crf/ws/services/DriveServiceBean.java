@@ -19,7 +19,7 @@ import com.google.api.services.drive.model.FileList;
 
 @Service
 public class DriveServiceBean implements DriveService {
-	GConnectToken gct;
+	GConnectToken gct = null;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
 	@Override
@@ -53,9 +53,11 @@ public class DriveServiceBean implements DriveService {
         
         for(File file : result.getFiles()){
         	FileDrive fd = new FileDrive();
-        	fd.setId(file.getId());
-        	fd.setName(file.getName());
-        	ret.put(file.getId(), fd);        	
+        	if(file.getName().contains("ANNULE")==false){
+	        	fd.setId(file.getId());
+	        	fd.setName(file.getName());
+	        	ret.put(file.getId(), fd);        	
+        	}
         }
         	        
         return ret.values();

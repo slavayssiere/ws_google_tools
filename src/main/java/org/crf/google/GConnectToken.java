@@ -55,6 +55,8 @@ public class GConnectToken {
 
     private static GoogleClientSecrets clientSecrets;
     
+    private Credential credential = null;
+    
     /** Constructor
      * 
      */
@@ -91,10 +93,10 @@ public class GConnectToken {
 	    	s3test = true;
     	}
     	catch(AmazonS3Exception ase){
+    		System.out.println("we are on dev machine");
     		s3test = false;
             
     	} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			s3test = false;
 		}
@@ -143,16 +145,18 @@ public class GConnectToken {
     public Credential authorize() throws Exception {
         // load client secrets
 
-    	getClientSecret();
-    	
-        // authorize        
-        GoogleCredential credential = new GoogleCredential.Builder()  
-                .setTransport(new NetHttpTransport())  
-                .setJsonFactory(JSON_FACTORY)  
-                .setClientSecrets(clientSecrets)
-                .build(); 
-        
-        credential.setAccessToken(accessToken);
+    	if(this.credential==null){
+	    	getClientSecret();
+	    	
+	        // authorize        
+	        this.credential = new GoogleCredential.Builder()  
+	                .setTransport(new NetHttpTransport())  
+	                .setJsonFactory(JSON_FACTORY)  
+	                .setClientSecrets(clientSecrets)
+	                .build(); 
+	        
+	        this.credential.setAccessToken(accessToken);
+    	}
         
         return credential;
       }

@@ -3,6 +3,7 @@ package org.crf.ws;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.crf.google.GConnectToken;
@@ -24,7 +25,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
+@RequestMapping(value = "/api/sheets")
+@Api(value="/api/sheets" , description="Session in gsheet management", consumes="application/json")
 public class InscriptionController {
 
 	@Autowired
@@ -36,7 +42,8 @@ public class InscriptionController {
 	@Autowired
 	private SheetService sheetService;
 
-	@RequestMapping(value = "/api/sheets/state", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/state", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value="GetAllSessions", nickname="Get all sessions")
 	public ResponseEntity<List<Session>> getStates(@RequestParam("token") String token) {
 
 		List<Session> sessionColl = new ArrayList<Session>();
@@ -59,17 +66,18 @@ public class InscriptionController {
 				}
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			new ResponseEntity<List<Session>>(sessionColl, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			new ResponseEntity<List<Session>>(sessionColl, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return new ResponseEntity<List<Session>>(sessionColl, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/api/sheets/state", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/state", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value="GetDataForOneSession", nickname="Get Data For One Session")
 	public ResponseEntity<Session> getState(@RequestParam("token") String token, @RequestBody Session sess) {
 
 		Session newsess = null;
@@ -93,17 +101,17 @@ public class InscriptionController {
 
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Session>(newsess, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return new ResponseEntity<Session>(newsess, HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/api/sheets/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	@ApiOperation(value="CreateNewSession", nickname="Create new session in calendar and sheet")
 	public ResponseEntity<Session> createNewSession(@RequestParam("token") String token, @RequestBody Session sess) {
 
 		Session getsession = null;
