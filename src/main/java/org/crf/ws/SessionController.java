@@ -17,14 +17,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+
 @RestController
+@RequestMapping(value = "/api/sessions")
+@Api(value="/api/sessions" , description="Sessions managements", consumes="application/json")
 public class SessionController {
 	
 	@Autowired
 	private SessionService sessionService;
 	
+	@ApiOperation(value="GetAllSessions", nickname="Get all sessions")
 	@RequestMapping(
-			value="/api/sessions", 
+			value="/", 
 			method=RequestMethod.GET, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Collection<Session>> getSessions() {
@@ -35,7 +41,7 @@ public class SessionController {
 	}
 	
 	@RequestMapping(
-			value="/api/sessions/{id}",
+			value="/{id}",
 			method=RequestMethod.GET,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Session> getSession(@PathVariable("id") Integer id){
@@ -48,7 +54,7 @@ public class SessionController {
 	}
 	
 	@RequestMapping(
-			value="/api/sessions", 
+			value="/", 
 			method=RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Session> createSession(@RequestBody Session session) {
@@ -59,7 +65,7 @@ public class SessionController {
 	}
 	
 	@RequestMapping(
-			value="/api/sessions", 
+			value="/", 
 			method=RequestMethod.PUT, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Session> updateSession(@RequestBody Session session) {
@@ -73,7 +79,7 @@ public class SessionController {
 	}
 	
 	@RequestMapping(
-			value="/api/sessions/{id}",
+			value="/{id}",
 			method=RequestMethod.DELETE,
 			produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Session> deleteSession(@PathVariable("id") Integer id){

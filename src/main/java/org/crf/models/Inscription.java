@@ -2,8 +2,11 @@ package org.crf.models;
 
 import java.util.Date;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class Inscription {
 	
+	@ApiModelProperty(notes = "Presence in formation")
 	private String presence;
 	private String reglement;
 	private String civilite;
@@ -19,7 +22,11 @@ public class Inscription {
 	
 	private int row;
 	
+
+	@ApiModelProperty(notes = "Type de formation", required=true)
 	private String typeFormation;
+	
+	@ApiModelProperty(notes = "Date de la session", required=true)
 	private Date dateFormation;
 	
 	private String message;
