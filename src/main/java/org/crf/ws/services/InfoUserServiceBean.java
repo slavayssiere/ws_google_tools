@@ -46,7 +46,6 @@ public class InfoUserServiceBean implements InfoUserService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-        System.out.println("connection email:" + uinfo.getEmail());
         return uinfo.getEmail();
     }
 

@@ -51,6 +51,10 @@ public class ScriptData {
 		this.error = error;
 	}
 	public List<String> getListArguments() {
+		if(this.listArguments == null){
+			this.listArguments = new ArrayList<String>();
+		}
+		
 		return listArguments;
 	}
 	public void setListArguments(List<String> listArguments) {
