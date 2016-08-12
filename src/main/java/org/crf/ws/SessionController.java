@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value = "/api/sessions")
 @Api(value="/api/sessions" , description="Sessions managements", consumes="application/json")
-public class SessionController {
+public class SessionController extends BaseController {
 	
 	@Autowired
 	private SessionService sessionService;

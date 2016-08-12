@@ -3,7 +3,7 @@ package org.crf.ws.services;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 import org.crf.models.Session;
 import org.springframework.stereotype.Service;
 
@@ -15,10 +15,10 @@ import com.google.api.services.calendar.model.EventDateTime;
 
 @Service
 public class CalendarServiceBean implements CalendarService {
-	private GConnectToken gct;
+	private GoogleConnection gct;
 
 	@Override
-    public void setToken(GConnectToken newgct){
+    public void setToken(GoogleConnection newgct){
         gct = newgct;
     }
     

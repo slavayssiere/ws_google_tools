@@ -2,7 +2,8 @@ package org.crf.ws;
 
 import java.io.IOException;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
+import org.crf.google.GoogleConnectionBean;
 import org.crf.models.GoogleCodeFlow;
 import org.crf.ws.services.InfoUserService;
 import org.crf.ws.services.InfoUserServiceBean;
@@ -25,18 +26,20 @@ public class ConnexionController extends BaseController {
 	
 	@Autowired
 	private CounterService counterService;
+
+	@Autowired
+	private GoogleConnection gconnect;
 	
 	@RequestMapping(
 			value="/api/auth/google", 
 			method=RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GConnectToken> getCode(@RequestBody GoogleCodeFlow data) {	
+	public ResponseEntity<GoogleConnectionBean> getCode(@RequestBody GoogleCodeFlow data) {	
 		
 		counterService.increment("method.connexion");
 		
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.token_create(data.getCode(), data.getRedirectUri());
+			gconnect.token_create(data.getCode(), data.getRedirectUri());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -46,11 +49,11 @@ public class ConnexionController extends BaseController {
 		}
 		
 
-		infoService.setToken(gconnecttoken);
+		infoService.setToken(gconnect);
 		if (!infoService.getUserEmail().equals("inscription.crf7511@gmail.com")) {
-			return new ResponseEntity<GConnectToken>(new GConnectToken(), HttpStatus.FORBIDDEN);
+			return new ResponseEntity<GoogleConnectionBean>(new GoogleConnectionBean(), HttpStatus.FORBIDDEN);
 		}
 		
-		return new ResponseEntity<GConnectToken>(gconnecttoken, HttpStatus.OK);		
+		return new ResponseEntity<GoogleConnectionBean>((GoogleConnectionBean) gconnect, HttpStatus.OK);		
 	}
 }

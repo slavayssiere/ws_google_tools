@@ -2,6 +2,7 @@ package org.crf;
 
 import java.io.IOException;
 
+import org.crf.ws.BaseController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,6 +24,10 @@ public abstract class AbstractControllerTest extends AbstractTest {
 	
 	public void setUp(){
 		mvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+	}
+	
+	public void setUp(BaseController controller){
+		mvc = MockMvcBuilders.standaloneSetup(controller).build();
 	}
 	
 	protected String mapToJson(Object obj) throws JsonProcessingException {

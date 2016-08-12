@@ -2,13 +2,13 @@ package org.crf.ws.services;
 
 import java.util.List;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 import org.crf.models.Inscription;
 import org.crf.models.Session;
 
 public interface SheetService {
 
-	void setToken(GConnectToken newgct);
+	void setToken(GoogleConnection newgct);
 
 	Session getState(String spreadsheetId, int id) throws Exception;
 

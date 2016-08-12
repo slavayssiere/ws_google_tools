@@ -2,7 +2,7 @@ package org.crf.ws.services;
 
 import java.util.Collection;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 import org.crf.models.FileDrive;
 import org.crf.models.Session;
 
@@ -16,6 +16,6 @@ public interface DriveService {
 
 	FileDrive findOne(String titleFile) throws Exception;
 	
-	void setToken(GConnectToken gct);
+	void setToken(GoogleConnection gct);
 
 }

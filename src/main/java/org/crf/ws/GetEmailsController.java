@@ -3,7 +3,8 @@ package org.crf.ws;
 import java.io.IOException;
 import java.util.List;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnectionBean;
+import org.crf.google.GoogleConnection;
 import org.crf.models.Inscription;
 import org.crf.models.ScriptData;
 import org.crf.ws.services.DriveService;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 
 @RestController
-public class GetEmailsController {
+public class GetEmailsController extends BaseController {
 	
 	@Autowired
 	private ScriptService scriptService;
@@ -33,15 +34,16 @@ public class GetEmailsController {
 	@Autowired
 	private SheetService sheetService;
 
+	@Autowired
+	private GoogleConnection gconnect;
+	
 	@RequestMapping(value = "/api/sheets/launchscript", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ScriptData> launchScript(@RequestParam("token") String token) {
 
 		ScriptData sr = new ScriptData();
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			scriptService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			scriptService.setToken(gconnect);
 			sr.setFunctionName("sendInscrit");
 			sr.setScriptId("M1iqHwQ-j7dDT1NrEe_AKQvuRtcQ09sPP");
 			sr.setSheetId("1p3KhsRyutUGy75DHygK_yfrUteW8bIyfQ9BIrd00XB8");
@@ -66,11 +68,11 @@ public class GetEmailsController {
 		ScriptData sr = new ScriptData();
 		List<Inscription> listreturn = null;
 
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			scriptService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			scriptService.setToken(gconnect);
+			sheetService.setToken(gconnect);
+			
 			sr.setFunctionName("listEmails");
 			sr.setScriptId("MHr4dqf9ZmBeO9uaeqW8lPF8Gg9vJhx0I");
 			sr.setSheetId("1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE");
@@ -80,7 +82,6 @@ public class GetEmailsController {
 			if (sr.getError() != null) {
 				return new ResponseEntity<List<Inscription>>(listreturn, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-			sheetService.setToken(gconnecttoken);
 			listreturn = sheetService.getDataFromGetEmail();
 		} catch (GoogleJsonResponseException gjre) {
 			gjre.printStackTrace();
@@ -100,11 +101,9 @@ public class GetEmailsController {
 	public ResponseEntity<Inscription> getState(@RequestParam("token") String token, @RequestBody Inscription inscr,
 			@PathVariable("sheetid") String sheetid, @PathVariable("row") int row) {
 
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			sheetService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			sheetService.setToken(gconnect);
 			sheetService.addInscription(sheetid, row, inscr);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -120,11 +119,9 @@ public class GetEmailsController {
 	@RequestMapping(value = "/api/sheets/complete", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Inscription> getState(@RequestParam("token") String token, @RequestBody Inscription inscr) {
 
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			sheetService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			sheetService.setToken(gconnect);
 			sheetService.addEmailNewDate(inscr);
 			sheetService.addWaitingInscription(inscr);
 		} catch (IOException e) {
@@ -143,11 +140,9 @@ public class GetEmailsController {
 			@PathVariable("row") int row) {
 
 		boolean ret = false;
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			sheetService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			sheetService.setToken(gconnect);
 			ret = sheetService.deleteRow(row);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -165,11 +160,9 @@ public class GetEmailsController {
 
 		ScriptData sr = new ScriptData();
 
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			scriptService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			scriptService.setToken(gconnect);
 			sr.setFunctionName("sendInscrit");
 			sr.setScriptId("M1iqHwQ-j7dDT1NrEe_AKQvuRtcQ09sPP");
 			sr.setSheetId("1p3KhsRyutUGy75DHygK_yfrUteW8bIyfQ9BIrd00XB8");

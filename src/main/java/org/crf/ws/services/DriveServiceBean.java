@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 import org.crf.models.FileDrive;
 import org.crf.models.Session;
 import org.springframework.stereotype.Service;
@@ -19,11 +19,11 @@ import com.google.api.services.drive.model.FileList;
 
 @Service
 public class DriveServiceBean implements DriveService {
-	GConnectToken gct = null;
+	GoogleConnection gct = null;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
 	@Override
-    public void setToken(GConnectToken newgct){
+    public void setToken(GoogleConnection newgct){
         gct = newgct;
     }  
     

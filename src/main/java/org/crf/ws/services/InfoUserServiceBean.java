@@ -1,6 +1,6 @@
 package org.crf.ws.services;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -10,14 +10,14 @@ import com.google.api.services.oauth2.model.Userinfoplus;
 
 @Service
 public class InfoUserServiceBean implements InfoUserService {
-	GConnectToken gct;
+	GoogleConnection gct;
 
 
     /* (non-Javadoc)
 	 * @see org.crf.google.UserInfo#setToken(org.crf.google.GConnectToken)
 	 */
     @Override
-	public void setToken(GConnectToken newgct){
+	public void setToken(GoogleConnection newgct){
         gct = newgct;
     }
     

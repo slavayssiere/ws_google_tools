@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.crf.ws.services.SheetServiceBean;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.stereotype.Service;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentials;
@@ -35,7 +37,8 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 
-public class GConnectToken {
+@Service
+public class GoogleConnectionBean implements GoogleConnection {
 	 /** Application name. */
     private final String APPLICATION_NAME = "Google Sheets Formation";
 
@@ -60,7 +63,7 @@ public class GConnectToken {
     /** Constructor
      * 
      */
-    public GConnectToken() {
+    public GoogleConnectionBean() {
         try {
             HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
             new FileDataStoreFactory(DATA_STORE_DIR);
@@ -114,7 +117,11 @@ public class GConnectToken {
 		return null;    	
     }
 
-    public boolean token_create(String authCode, String redirectUri) throws Exception {
+    /* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#token_create(java.lang.String, java.lang.String)
+	 */
+    @Override
+	public boolean token_create(String authCode, String redirectUri) throws Exception {
         
     	getClientSecret();
     	    	
@@ -137,12 +144,11 @@ public class GConnectToken {
         return true;
       }
     
-    /**
-     * Creates an authorized Credential object.
-     * @return an authorized Credential object.
-     * @throws IOException
-     */
-    public Credential authorize() throws Exception {
+    /* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#authorize()
+	 */
+    @Override
+	public Credential authorize() throws Exception {
         // load client secrets
 
     	if(this.credential==null){
@@ -161,45 +167,85 @@ public class GConnectToken {
         return credential;
       }
 
-    @JsonProperty("token")
+    /* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#getAccessToken()
+	 */
+    @Override
+	@JsonProperty("token")
 	public String getAccessToken() {
 		return accessToken;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#setAccessToken(java.lang.String)
+	 */
+	@Override
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#getRefreshToken()
+	 */
+	@Override
 	public String getRefreshToken() {
 		return refreshToken;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#setRefreshToken(java.lang.String)
+	 */
+	@Override
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#getExpiresInSeconds()
+	 */
+	@Override
 	public Long getExpiresInSeconds() {
 		return expiresInSeconds;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#setExpiresInSeconds(java.lang.Long)
+	 */
+	@Override
 	public void setExpiresInSeconds(Long expiresInSeconds) {
 		this.expiresInSeconds = expiresInSeconds;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#getHTTP_TRANSPORT()
+	 */
+	@Override
 	@JsonIgnore
 	public HttpTransport getHTTP_TRANSPORT() {
 		return HTTP_TRANSPORT;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#setHTTP_TRANSPORT(com.google.api.client.http.HttpTransport)
+	 */
+	@Override
 	public void setHTTP_TRANSPORT(HttpTransport hTTP_TRANSPORT) {
 		HTTP_TRANSPORT = hTTP_TRANSPORT;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#getAPPLICATION_NAME()
+	 */
+	@Override
 	@JsonIgnore
 	public String getAPPLICATION_NAME() {
 		return APPLICATION_NAME;
 	}
 
+	/* (non-Javadoc)
+	 * @see org.crf.google.GoogleConnection#getJSON_FACTORY()
+	 */
+	@Override
 	@JsonIgnore
 	public JsonFactory getJSON_FACTORY() {
 		return JSON_FACTORY;

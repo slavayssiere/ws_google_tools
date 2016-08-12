@@ -6,7 +6,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnectionBean;
+import org.crf.google.GoogleConnection;
 import org.crf.models.FileDrive;
 import org.crf.models.Session;
 import org.crf.ws.services.CalendarService;
@@ -31,7 +32,7 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping(value = "/api/sheets")
 @Api(value="/api/sheets" , description="Session in gsheet management", consumes="application/json")
-public class InscriptionController {
+public class InscriptionController extends BaseController {
 
 	@Autowired
 	private CalendarService calendarService;
@@ -41,18 +42,19 @@ public class InscriptionController {
 	
 	@Autowired
 	private SheetService sheetService;
+	
+	@Autowired
+	private GoogleConnection gconnect;
 
 	@RequestMapping(value = "/state", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	@ApiOperation(value="GetAllSessions", nickname="Get all sessions")
 	public ResponseEntity<List<Session>> getStates(@RequestParam("token") String token) {
 
 		List<Session> sessionColl = new ArrayList<Session>();
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			driveService.setToken(gconnecttoken);
-			sheetService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			driveService.setToken(gconnect);
+			sheetService.setToken(gconnect);
 			
 			int id = 0;
 			for (FileDrive file : driveService.findAll()) {
@@ -81,15 +83,13 @@ public class InscriptionController {
 	public ResponseEntity<Session> getState(@RequestParam("token") String token, @RequestBody Session sess) {
 
 		Session newsess = null;
-		GConnectToken gconnecttoken = new GConnectToken();
 		SimpleDateFormat formaterTitle = new SimpleDateFormat("yyyy - MM - dd");
 		String titleFile = formaterTitle.format(sess.getDate()) + " " + sess.getType();
 		System.out.println(titleFile);
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			driveService.setToken(gconnecttoken);
-			sheetService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			driveService.setToken(gconnect);
+			sheetService.setToken(gconnect);
 			int id = 0;
 			FileDrive file = driveService.findOne(titleFile);
 			System.out.println("file:" + file.getName());
@@ -115,14 +115,11 @@ public class InscriptionController {
 	public ResponseEntity<Session> createNewSession(@RequestParam("token") String token, @RequestBody Session sess) {
 
 		Session getsession = null;
-		GConnectToken gconnecttoken = new GConnectToken();
 		try {
-			gconnecttoken.setAccessToken(token);
-			gconnecttoken.authorize();
-			
-			driveService.setToken(gconnecttoken);
-			sheetService.setToken(gconnecttoken);
-			calendarService.setToken(gconnecttoken);
+			gconnect.setAccessToken(token);
+			driveService.setToken(gconnect);
+			sheetService.setToken(gconnect);
+			calendarService.setToken(gconnect);
 			
 			getsession = driveService.copy("1TYxCseZaivEYMoWSPeYiF6zpLkKYPvDoY5t0aMWsMg0", sess);
 			if (getsession == null) {

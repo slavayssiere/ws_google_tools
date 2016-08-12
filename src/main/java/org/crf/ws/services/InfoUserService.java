@@ -1,10 +1,10 @@
 package org.crf.ws.services;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 
 public interface InfoUserService {
 
-	void setToken(GConnectToken newgct);
+	void setToken(GoogleConnection newgct);
 
 	String getUserEmail();
 

@@ -9,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.crf.google.GConnectToken;
+import org.crf.google.GoogleConnection;
 import org.crf.models.Inscription;
 import org.crf.models.Session;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ import com.google.api.services.sheets.v4.model.ValueRange;
 @Service
 public class SheetServiceBean implements SheetService {
 
-	private GConnectToken gct;
+	private GoogleConnection gct;
 
 	private SimpleDateFormat formaterHyphen = new SimpleDateFormat("dd-MM-yyyy");
 	private SimpleDateFormat formaterSlash = new SimpleDateFormat("dd/MM/yyyy");
@@ -48,7 +48,7 @@ public class SheetServiceBean implements SheetService {
 	 * @see org.crf.google.SheetService#setToken(org.crf.google.GConnectToken)
 	 */
 	@Override
-	public void setToken(GConnectToken newgct) {
+	public void setToken(GoogleConnection newgct) {
 		gct = newgct;
 	}
 
