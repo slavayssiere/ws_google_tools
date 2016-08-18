@@ -8,6 +8,7 @@ import org.crf.google.GoogleConnection;
 import org.crf.models.Inscription;
 import org.crf.models.ScriptData;
 import org.crf.ws.services.DriveService;
+import org.crf.ws.services.GmailService;
 import org.crf.ws.services.ScriptService;
 import org.crf.ws.services.ScriptServiceBean;
 import org.crf.ws.services.SheetService;
@@ -36,6 +37,9 @@ public class GetEmailsController extends BaseController {
 
 	@Autowired
 	private GoogleConnection gconnect;
+	
+	@Autowired
+	private GmailService gmailService;
 	
 	@RequestMapping(value = "/api/sheets/launchscript", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ScriptData> launchScript(@RequestParam("token") String token) {
@@ -106,11 +110,11 @@ public class GetEmailsController extends BaseController {
 			sheetService.setToken(gconnect);
 			sheetService.addInscription(sheetid, row, inscr);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Inscription>(inscr, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Inscription>(inscr, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return new ResponseEntity<Inscription>(inscr, HttpStatus.OK);
@@ -125,11 +129,11 @@ public class GetEmailsController extends BaseController {
 			sheetService.addEmailNewDate(inscr);
 			sheetService.addWaitingInscription(inscr);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Inscription>(inscr, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Inscription>(inscr, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return new ResponseEntity<Inscription>(inscr, HttpStatus.OK);
@@ -145,11 +149,11 @@ public class GetEmailsController extends BaseController {
 			sheetService.setToken(gconnect);
 			ret = sheetService.deleteRow(row);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Boolean>(ret, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<Boolean>(ret, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return new ResponseEntity<Boolean>(ret, HttpStatus.OK);
@@ -182,4 +186,21 @@ public class GetEmailsController extends BaseController {
 		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/api/sheets/draft", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Boolean> createDraft(@RequestParam("token") String token, @RequestBody Inscription inscr) {
+
+		try {
+			gconnect.setAccessToken(token);
+			gmailService.setToken(gconnect);
+			gmailService.createDraft(inscr);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<Boolean>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+
+		return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+	}
 }
