@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.crf.ws.services.SheetServiceBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.amazonaws.AmazonClientException;
@@ -38,6 +41,9 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 
 @Service
 public class GoogleConnectionBean implements GoogleConnection {
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	 /** Application name. */
     private final String APPLICATION_NAME = "Google Sheets Formation";
 
@@ -72,18 +78,17 @@ public class GoogleConnectionBean implements GoogleConnection {
         }
     }
     
-    private S3Object getS3Data(){
-        AmazonS3 s3 = new AmazonS3Client();
-        Region euWest1 = Region.getRegion(Regions.EU_WEST_1);
-        s3.setRegion(euWest1);
-        try
-        {
-        	return s3.getObject(new GetObjectRequest("static-private-file", "client_secret_oauth.json"));
-        }
-        catch(AmazonS3Exception ase){
-    		throw ase;
-    	}
-    }
+    private S3Object getS3Data(String filename) {
+		AmazonS3 s3 = new AmazonS3Client();
+		Region euWest1 = Region.getRegion(Regions.EU_WEST_1);
+		s3.setRegion(euWest1);
+		try {
+			return s3.getObject(new GetObjectRequest("static-private-file", filename));
+		} catch (AmazonS3Exception ase) {
+			throw ase;
+		}
+	}
+
     
     private GoogleClientSecrets getClientSecret(){
     	
@@ -91,7 +96,7 @@ public class GoogleConnectionBean implements GoogleConnection {
     	try
     	{
 	    	this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-	                new InputStreamReader(getS3Data().getObjectContent()));
+	                new InputStreamReader(getS3Data("client_secret_oauth.json").getObjectContent()));
 	    	s3test = true;
     	}
     	catch(AmazonS3Exception ase){
@@ -115,6 +120,16 @@ public class GoogleConnectionBean implements GoogleConnection {
     	
 		return null;    	
     }
+    
+    private InputStream getSecretFile() {
+		try {
+			return (InputStream)getS3Data("client_secret.json").getObjectContent();
+		} catch (AmazonS3Exception ase) {
+			logger.info("we are on dev machine");
+		}
+
+		return SheetServiceBean.class.getResourceAsStream("/client_secret.json");
+	}
 
     /* (non-Javadoc)
 	 * @see org.crf.google.GoogleConnection#token_create(java.lang.String, java.lang.String)
@@ -165,6 +180,11 @@ public class GoogleConnectionBean implements GoogleConnection {
         
         return credential;
       }
+    
+    public void createCredentialForServer(Collection<String> scopes) throws IOException{
+		this.credential = GoogleCredential.fromStream(getSecretFile())
+			    .createScoped(scopes);
+	}
 
     /* (non-Javadoc)
 	 * @see org.crf.google.GoogleConnection#getAccessToken()
