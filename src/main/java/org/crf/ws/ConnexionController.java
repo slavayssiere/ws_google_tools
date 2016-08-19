@@ -26,34 +26,33 @@ public class ConnexionController extends BaseController {
 	
 	@Autowired
 	private CounterService counterService;
-
-	@Autowired
-	private GoogleConnection gconnect;
 	
 	@RequestMapping(
 			value="/api/auth/google", 
 			method=RequestMethod.POST, 
 			produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GoogleConnectionBean> getCode(@RequestBody GoogleCodeFlow data) {	
+	public ResponseEntity<GoogleConnection> getCode(@RequestBody GoogleCodeFlow data) {	
 		
 		counterService.increment("method.connexion");
+		GoogleConnectionBean gconnect = new GoogleConnectionBean();
 		
 		try {
 			gconnect.token_create(data.getCode(), data.getRedirectUri());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<GoogleConnection>(gconnect, HttpStatus.INTERNAL_SERVER_ERROR);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			return new ResponseEntity<GoogleConnection>(gconnect, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 
 		infoService.setToken(gconnect);
 		if (!infoService.getUserEmail().equals("inscription.crf7511@gmail.com")) {
-			return new ResponseEntity<GoogleConnectionBean>(new GoogleConnectionBean(), HttpStatus.FORBIDDEN);
+			gconnect.setMessage("Bienvenue " + infoService.getUserEmail() + " , connecte toi avec inscription.crf7511@gmail.com");
+			return new ResponseEntity<GoogleConnection>((GoogleConnectionBean)gconnect, HttpStatus.FORBIDDEN);
 		}
 		
-		return new ResponseEntity<GoogleConnectionBean>((GoogleConnectionBean) gconnect, HttpStatus.OK);		
+		return new ResponseEntity<GoogleConnection>((GoogleConnectionBean) gconnect, HttpStatus.OK);		
 	}
 }

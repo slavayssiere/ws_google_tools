@@ -60,6 +60,8 @@ public class GoogleConnectionBean implements GoogleConnection {
     private String accessToken;  
     private String refreshToken;  
     private Long expiresInSeconds;
+    
+    private String message;
 
     private static GoogleClientSecrets clientSecrets;
     
@@ -291,5 +293,15 @@ public class GoogleConnectionBean implements GoogleConnection {
 				httpRequest.setReadTimeout(380000);
 			}
 		};
+	}
+
+	@Override
+	public String getMessage() {
+		return message;
+	}
+
+	@Override
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }

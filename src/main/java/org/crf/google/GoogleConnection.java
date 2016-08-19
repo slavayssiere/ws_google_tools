@@ -39,4 +39,8 @@ public interface GoogleConnection {
 
 	JsonFactory getJSON_FACTORY();
 
+	String getMessage();
+
+	void setMessage(String message);
+
 }
