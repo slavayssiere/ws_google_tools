@@ -20,7 +20,7 @@ public class WsGoogleToolsApplication {
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurerAdapter() {
 			@Override
-			public void addCorsMappings(CorsRegistry registry) {
+			public void addCorsMappings(CorsRegistry registry) {			
 				listApi(registry, "http://ul-management.s3-website-eu-west-1.amazonaws.com", "http://localhost:8080");
 			}
 
