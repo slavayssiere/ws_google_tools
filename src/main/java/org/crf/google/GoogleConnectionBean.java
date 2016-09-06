@@ -176,9 +176,10 @@ public class GoogleConnectionBean implements GoogleConnection {
 	                .setJsonFactory(JSON_FACTORY)  
 	                .setClientSecrets(clientSecrets)
 	                .build(); 
-	        
-	        this.credential.setAccessToken(accessToken);
     	}
+
+        
+        this.credential.setAccessToken(accessToken);
         
         return credential;
       }
