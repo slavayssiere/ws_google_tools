@@ -291,7 +291,7 @@ public class SheetServiceBean implements SheetService {
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getVille())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getPhone())));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getEmail())));
-		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getMessage())));
+		//values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(inscr.getMessage())));
 
 		requests.add(new Request().setUpdateCells(
 				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(row).setColumnIndex(3))
