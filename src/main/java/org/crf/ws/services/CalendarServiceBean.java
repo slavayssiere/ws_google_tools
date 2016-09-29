@@ -37,25 +37,31 @@ public class CalendarServiceBean implements CalendarService {
     	Calendar service = getCalendarService();
     	String calendarPSC1 = "udk2esse0hsos1ho8a7ukng43s@group.calendar.google.com";
     	String calendarIPSEN = "os1qv8all2n00vg5l80qu0brog@group.calendar.google.com";
+    	int addTimePSC1 = 9;
+    	int addTimeIPSEN = 4;
     	String calendarId = "";
+    	int addTime=0;
     	if(sess.getType().equals("PSC1")){
     		calendarId = calendarPSC1;
+    		addTime=addTimePSC1;
     	}
     	else {
     		calendarId = calendarIPSEN;
+    		addTime=addTimeIPSEN;
     	}
     	
     	Event event = new Event();
         event.setSummary(sess.getType() + " " + sess.getFormateur());
         
         java.util.Calendar cal = java.util.Calendar.getInstance();
+        cal.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(sess.getDate());
         cal.set(java.util.Calendar.HOUR_OF_DAY, sess.getHeure());
         cal.set(java.util.Calendar.MINUTE, 0);
         cal.set(java.util.Calendar.SECOND, 0);
         
         Date startDate = cal.getTime();
-        cal.add(java.util.Calendar.HOUR, 9);
+        cal.add(java.util.Calendar.HOUR, addTime);
         Date endDate = cal.getTime();
         
         DateTime start = new DateTime(startDate, TimeZone.getTimeZone("Europe/Paris"));
