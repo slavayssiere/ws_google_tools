@@ -46,7 +46,6 @@ public class FillSheetBatchBean {
 	public void test(){
 		logger.info("batch debut");
 
-		List<Session> sessionColl = new ArrayList<Session>();
 		int id = 1;
 		try {
 			GoogleConnectionBatch gcb = new GoogleConnectionBatch();

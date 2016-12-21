@@ -58,7 +58,6 @@ public class InscriptionController extends BaseController {
 			
 			int id = 0;
 			for (FileDrive file : driveService.findAllAfter(new Date())) {
-				System.out.println("file:" + file.getName());
 				Session sess = sheetService.getState(file.getId(), id);
 				if (sess != null) {
 					sess.setGoogle_id(file.getId());
@@ -85,7 +84,6 @@ public class InscriptionController extends BaseController {
 		Session newsess = null;
 		SimpleDateFormat formaterTitle = new SimpleDateFormat("yyyy - MM - dd");
 		String titleFile = formaterTitle.format(sess.getDate()) + " " + sess.getType();
-		System.out.println(titleFile);
 		try {
 			gconnect.setAccessToken(token);
 			driveService.setToken(gconnect);

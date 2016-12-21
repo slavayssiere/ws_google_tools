@@ -137,7 +137,6 @@ public class DriveServiceBean implements DriveService {
 
 	@Override
 	public Collection<FileDrive> findAllAfter(Date date) throws Exception {
-		logger.info("get all after: " + date.toString());
 		// Build a new authorized API client service.
         Drive service = getDriveService();
 
@@ -146,7 +145,6 @@ public class DriveServiceBean implements DriveService {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         
-        logger.info("Year: " + cal.get(Calendar.YEAR));
         FileList result =  service.files().list()	       
 	        .setFields("files(id,name,mimeType),nextPageToken")
 	        .setQ("mimeType='application/vnd.google-apps.spreadsheet' and name contains '"+cal.get(Calendar.YEAR)+"' or name contains '"+(cal.get(Calendar.YEAR) + 1)+"'")

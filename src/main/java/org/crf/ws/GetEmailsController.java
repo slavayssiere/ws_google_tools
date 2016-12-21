@@ -82,7 +82,6 @@ public class GetEmailsController extends BaseController {
 			sr.setSheetId("1zoE5UHWmZKljQFGqOBUgWGEikr1So9HuZnH4Y0td6XE");
 			sr.setNewArguments("blabla");
 			sr = scriptService.execute(sr); // scriptid,sheetid
-			System.out.println(sr);
 			if (sr.getError() != null) {
 				return new ResponseEntity<List<Inscription>>(listreturn, HttpStatus.INTERNAL_SERVER_ERROR);
 			}
