@@ -15,6 +15,8 @@ hs_err_pid*
 #seb add
 client_secret.json
 client_secret_oauth.json
+formation-management.json
+.DS_Store
 
 target
 
