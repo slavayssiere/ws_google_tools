@@ -3,19 +3,13 @@ package org.crf.google;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.crf.ws.services.SheetServiceBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.AmazonClientException;
-import com.amazonaws.auth.AWSCredentials;
-import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.auth.profile.internal.ProfileAssumeRoleCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
@@ -90,7 +84,6 @@ public class GoogleConnectionBean implements GoogleConnection {
 			throw ase;
 		}
 	}
-
     
     private GoogleClientSecrets getClientSecret(){
     	
@@ -184,11 +177,6 @@ public class GoogleConnectionBean implements GoogleConnection {
         return credential;
       }
     
-    public void createCredentialForServer(Collection<String> scopes) throws IOException{
-		this.credential = GoogleCredential.fromStream(getSecretFile())
-			    .createScoped(scopes);
-	}
-
     /* (non-Javadoc)
 	 * @see org.crf.google.GoogleConnection#getAccessToken()
 	 */

@@ -57,7 +57,7 @@ public class InscriptionController extends BaseController {
 			sheetService.setToken(gconnect);
 			
 			int id = 0;
-			for (FileDrive file : driveService.findAll()) {
+			for (FileDrive file : driveService.findAllAfter(new Date())) {
 				System.out.println("file:" + file.getName());
 				Session sess = sheetService.getState(file.getId(), id);
 				if (sess != null) {

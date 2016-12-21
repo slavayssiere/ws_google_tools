@@ -2,13 +2,17 @@ package org.crf.ws.services;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.crf.google.GoogleConnection;
 import org.crf.models.FileDrive;
 import org.crf.models.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -21,6 +25,8 @@ import com.google.api.services.drive.model.FileList;
 public class DriveServiceBean implements DriveService {
 	GoogleConnection gct = null;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@Override
     public void setToken(GoogleConnection newgct){
@@ -38,7 +44,7 @@ public class DriveServiceBean implements DriveService {
 	 * @see org.crf.google.DriveService#findAll()
 	 */
     @Override
-	public Collection<FileDrive> findAll() throws Exception {
+	public Collection<FileDrive> findAll(String year) throws Exception {
         // Build a new authorized API client service.
         Drive service = getDriveService();
 
@@ -47,7 +53,7 @@ public class DriveServiceBean implements DriveService {
         
         FileList result =  service.files().list()	       
 	        .setFields("files(id,name,mimeType),nextPageToken")
-	        .setQ("mimeType='application/vnd.google-apps.spreadsheet' and name contains '2016'")
+	        .setQ("mimeType='application/vnd.google-apps.spreadsheet' and name contains '"+year+"'")
 	        .setPageSize(1000)
 	        .execute();
         
@@ -127,6 +133,52 @@ public class DriveServiceBean implements DriveService {
            
         	        
         return fd;
+	}
+
+	@Override
+	public Collection<FileDrive> findAllAfter(Date date) throws Exception {
+		logger.info("get all after: " + date.toString());
+		// Build a new authorized API client service.
+        Drive service = getDriveService();
+
+        Map<String, FileDrive> ret = new HashMap<String, FileDrive>();   
+        
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        
+        logger.info("Year: " + cal.get(Calendar.YEAR));
+        FileList result =  service.files().list()	       
+	        .setFields("files(id,name,mimeType),nextPageToken")
+	        .setQ("mimeType='application/vnd.google-apps.spreadsheet' and name contains '"+cal.get(Calendar.YEAR)+"' or name contains '"+(cal.get(Calendar.YEAR) + 1)+"'")
+	        .setPageSize(1000)
+	        .execute();
+        
+        for(File file : result.getFiles()){
+        	FileDrive fd = new FileDrive();
+        	if(file.getName().contains("ANNULE")==false){
+        		
+        		String[] test = file.getName().split(" ");
+        		
+        		try
+        		{
+	        		cal.set(Calendar.YEAR, Integer.parseInt(test[0]));
+	        		cal.set(Calendar.MONTH, Integer.parseInt(test[2]) - 1);
+	        		cal.set(Calendar.DAY_OF_MONTH, Integer.parseInt(test[4]));
+	        		
+	        		if(cal.getTime().after(date)){
+			        	fd.setId(file.getId());
+			        	fd.setName(file.getName());
+			        	ret.put(file.getId(), fd); 
+	        		}
+        		}
+        		catch(Exception e)
+        		{
+        			logger.info("Filename in error: " + file.getName());
+        		}
+        	}
+        }
+        	        
+        return ret.values();
 	}
 	
 }

@@ -1,5 +1,6 @@
 package org.crf.ws.services;
 
+import java.util.Date;
 import java.util.List;
 
 import org.crf.google.GoogleConnection;
@@ -23,5 +24,7 @@ public interface SheetService {
 	void addWaitingInscription(Inscription inscr) throws Exception;
 
 	void addEmailNewDate(Inscription inscr) throws Exception;
+
+	void updateSessionsDisponibles(Date date, int nbplaces, int id) throws Exception;
 
 }

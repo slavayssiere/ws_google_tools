@@ -10,6 +10,8 @@ import java.util.Map;
 import org.crf.google.GoogleConnectionBean;
 import org.crf.google.GoogleConnection;
 import org.crf.models.ScriptData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.google.api.client.auth.oauth2.Credential;
@@ -18,8 +20,12 @@ import com.google.api.services.script.Script;
 import com.google.api.services.script.model.ExecutionRequest;
 import com.google.api.services.script.model.Operation;
 
+
 @Service
 public class ScriptServiceBean implements ScriptService {
+
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	GoogleConnection gct;
 	SimpleDateFormat dt1 = new SimpleDateFormat("yyyy - MM - dd");
 
@@ -79,8 +85,13 @@ public class ScriptServiceBean implements ScriptService {
 			// Script function returns. Here, the function returns
 			// an Apps Script Object with String keys and values,
 			// so must be cast into a Java Map (folderSet).
-			BigDecimal bd = (BigDecimal) op.getResponse().get("result");
-			sr.setNbLines(bd.intValue());
+			try {
+				BigDecimal bd = (BigDecimal) op.getResponse().get("result");
+				sr.setNbLines(bd.intValue());
+			}
+			catch(NullPointerException npe){
+				logger.info("not a number");
+			}
 		}
 
 		return sr;

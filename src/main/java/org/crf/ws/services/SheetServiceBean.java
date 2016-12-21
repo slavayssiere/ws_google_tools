@@ -5,6 +5,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -403,5 +404,31 @@ public class SheetServiceBean implements SheetService {
 		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
 
 		service.spreadsheets().batchUpdate(spreadsheetId, batchUpdateRequest).execute();
+	}
+	
+	@Override
+	public void updateSessionsDisponibles(Date date, int nbplaces, int id) throws Exception {
+		Sheets service = getSheetsService();
+		String idMailAutomatique = "1dgM6JG5GOc72B5a2ZdGlcIDYw9XPNV75cDB9h5e17vQ";
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+		cal.set(Calendar.HOUR_OF_DAY, 9);
+		Double valDate = getEpochDate(cal.getTime());
+
+		List<Request> requests = new ArrayList<>();
+		List<CellData> values = new ArrayList<>();
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setNumberValue(valDate))
+				.setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType("DATE"))));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setNumberValue((double) nbplaces)));
+		
+		requests.add(new Request().setUpdateCells(
+				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(id).setColumnIndex(1))
+						.setRows(Arrays.asList(new RowData().setValues(values)))
+						.setFields("userEnteredValue,userEnteredFormat.numberFormat")));
+
+		BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
+
+		service.spreadsheets().batchUpdate(idMailAutomatique, batchUpdateRequest).execute();
 	}
 }
