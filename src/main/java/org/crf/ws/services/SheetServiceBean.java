@@ -407,6 +407,30 @@ public class SheetServiceBean implements SheetService {
 	}
 	
 	@Override
+	public void eraseSessionsDisponibles() throws Exception {
+		Sheets service = getSheetsService();
+		String idMailAutomatique = "1dgM6JG5GOc72B5a2ZdGlcIDYw9XPNV75cDB9h5e17vQ";
+		
+		//erase existing data
+		for(int i=1; i<=30; i++){
+			List<Request> requests = new ArrayList<>();
+			List<CellData> values = new ArrayList<>();
+			
+			values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue("")));
+			values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue("")));
+			
+			requests.add(new Request().setUpdateCells(
+					new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(i).setColumnIndex(1))
+							.setRows(Arrays.asList(new RowData().setValues(values)))
+							.setFields("userEnteredValue,userEnteredFormat.numberFormat")));
+
+			BatchUpdateSpreadsheetRequest batchUpdateRequest = new BatchUpdateSpreadsheetRequest().setRequests(requests);
+
+			service.spreadsheets().batchUpdate(idMailAutomatique, batchUpdateRequest).execute();
+		}
+	}
+	
+	@Override
 	public void updateSessionsDisponibles(Date date, int nbplaces, int id) throws Exception {
 		Sheets service = getSheetsService();
 		String idMailAutomatique = "1dgM6JG5GOc72B5a2ZdGlcIDYw9XPNV75cDB9h5e17vQ";
@@ -415,9 +439,10 @@ public class SheetServiceBean implements SheetService {
 		cal.setTime(date);
 		cal.set(Calendar.HOUR_OF_DAY, 9);
 		Double valDate = getEpochDate(cal.getTime());
-
+		
 		List<Request> requests = new ArrayList<>();
 		List<CellData> values = new ArrayList<>();
+		
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setNumberValue(valDate))
 				.setUserEnteredFormat(new CellFormat().setNumberFormat(new NumberFormat().setType("DATE"))));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setNumberValue((double) nbplaces)));

@@ -22,7 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
-		<docker.image.prefix>slavayssiere</docker.image.prefix>
+		<docker.image.prefix>eu.gcr.io/formation-container-test</docker.image.prefix>
 	</properties>
 	
 	<dependencies>
@@ -139,21 +139,21 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>docker-maven-plugin</artifactId>
-				<version>0.2.3</version>
-				<configuration>
-					<imageName>${docker.image.prefix}/${project.artifactId}</imageName>
-					<dockerDirectory>src/main/docker</dockerDirectory>
-					<resources>
-						<resource>
-							<targetPath>/</targetPath>
-							<directory>${project.build.directory}</directory>
-							<include>${project.build.finalName}.jar</include>
-						</resource>
-					</resources>
-				</configuration>
-			</plugin>
+	            <groupId>com.spotify</groupId>
+	            <artifactId>docker-maven-plugin</artifactId>
+	            <version>0.4.11</version>
+	            <configuration>
+	                <imageName>${docker.image.prefix}/${project.artifactId}</imageName>
+	                <dockerDirectory>src/main/docker</dockerDirectory>
+	                <resources>
+	                    <resource>
+	                        <targetPath>/</targetPath>
+	                        <directory>${project.build.directory}</directory>
+	                        <include>${project.build.finalName}.jar</include>
+	                    </resource>
+	                </resources>
+	            </configuration>
+	        </plugin>
 		</plugins>
 	</build>
 
@@ -162,6 +162,6 @@
 		<url>https://github.com/slavayssiere/ws_google_tools</url>
 		<developerConnection>scm:git:ssh://git@github.com:slavayssiere/ws_google_tools.git</developerConnection>
 		<connection>scm:git:ssh://git@github.com:slavayssiere/ws_google_tools.git</connection>
-		<tag>1.0.2</tag>
+		<tag>${version}</tag>
 	</scm>
 </project>

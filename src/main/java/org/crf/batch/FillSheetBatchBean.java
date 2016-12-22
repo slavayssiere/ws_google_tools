@@ -55,6 +55,8 @@ public class FillSheetBatchBean {
 			sheetService.setToken(gcb);
 			scriptService.setToken(gcb);
 			
+			sheetService.eraseSessionsDisponibles();
+			
 			for (FileDrive file : driveService.findAllAfter(new Date())) {
 				try {
 					Session sess = sheetService.getState(file.getId(), id);

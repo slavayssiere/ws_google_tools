@@ -27,4 +27,6 @@ public interface SheetService {
 
 	void updateSessionsDisponibles(Date date, int nbplaces, int id) throws Exception;
 
+	void eraseSessionsDisponibles() throws Exception;
+
 }
