@@ -169,6 +169,7 @@ public class SheetServiceBean implements SheetService {
 		values.add(new CellData()
 				.setUserEnteredValue(new ExtendedValue().setNumberValue(Double.valueOf(sess.getHeure()))));
 		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(sess.getFormateur())));
+		values.add(new CellData().setUserEnteredValue(new ExtendedValue().setStringValue(sess.getNivol())));
 
 		requests.add(new Request().setUpdateCells(
 				new UpdateCellsRequest().setStart(new GridCoordinate().setSheetId(0).setRowIndex(0).setColumnIndex(1))

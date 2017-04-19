@@ -66,6 +66,9 @@ public class InscriptionController extends BaseController {
 					id++;
 				}
 			}
+		} catch(GoogleJsonResponseException gse){
+			gse.printStackTrace();
+			new ResponseEntity<List<Session>>(sessionColl, HttpStatus.UNAUTHORIZED);
 		} catch (IOException e) {
 			e.printStackTrace();
 			new ResponseEntity<List<Session>>(sessionColl, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -96,7 +99,6 @@ public class InscriptionController extends BaseController {
 				newsess.setGoogle_id(file.getId());
 				newsess.setGoogle_name(file.getName());
 				id++;
-
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

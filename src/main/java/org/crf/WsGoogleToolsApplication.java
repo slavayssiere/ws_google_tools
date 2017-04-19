@@ -23,23 +23,24 @@ public class WsGoogleToolsApplication {
 		return new WebMvcConfigurerAdapter() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {			
-				listApi(registry, "http://ul-management.s3-website-eu-west-1.amazonaws.com", "http://localhost:8080");
+				listApi(registry, "http://ul-management.s3-website-eu-west-1.amazonaws.com");
+				listApi(registry, "http://localhost:8080");
+				listApi(registry, "http://localhost:3000");
 			}
 
-			public void listApi(CorsRegistry registry, String url, String url2) {
-				registry.addMapping("/info").allowedOrigins(url, url2);
-				registry.addMapping("/api/auth/google").allowedOrigins(url, url2);
-				registry.addMapping("/api/files").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/state").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/create").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/launchscript").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/getemails").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/inscription/{sheetid}/{row}").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/complete").allowedOrigins(url, url2);
-				registry.addMapping("/api/sheets/getemails/{row}").allowedOrigins(url, url2).allowedMethods("DELETE");
-				registry.addMapping("/api/sheets/{sheetid}/sendinscrits").allowedOrigins(url, url2)
-						.allowedMethods("PUT");
-				registry.addMapping("/api/sheets/draft").allowedOrigins(url, url2).allowedMethods("POST");
+			public void listApi(CorsRegistry registry, String url) {
+				registry.addMapping("/info").allowedOrigins(url).allowedMethods("GET", "OPTIONS");
+				registry.addMapping("/api/auth/google").allowedOrigins(url);
+				registry.addMapping("/api/files").allowedOrigins(url);
+				registry.addMapping("/api/sheets/state").allowedOrigins(url);
+				registry.addMapping("/api/sheets/create").allowedOrigins(url);
+				registry.addMapping("/api/sheets/launchscript").allowedOrigins(url);
+				registry.addMapping("/api/sheets/getemails").allowedOrigins(url);
+				registry.addMapping("/api/sheets/inscription/{sheetid}/{row}").allowedOrigins(url);
+				registry.addMapping("/api/sheets/complete").allowedOrigins(url);
+				registry.addMapping("/api/sheets/getemails/{row}").allowedOrigins(url).allowedMethods("DELETE");
+				registry.addMapping("/api/sheets/{sheetid}/sendinscrits").allowedOrigins(url).allowedMethods("PUT");
+				registry.addMapping("/api/sheets/draft").allowedOrigins(url).allowedMethods("POST");
 			}
 		};
 	}

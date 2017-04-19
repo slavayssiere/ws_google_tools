@@ -10,6 +10,8 @@ public class Session {
 
 	private String formateur;
 	
+	private String nivol;
+	
 	private String address;
 	
 	private Date date;
@@ -124,5 +126,13 @@ public class Session {
 
 	public void setHeure(Integer heure) {
 		this.heure = heure;
+	}
+
+	public String getNivol() {
+		return nivol;
+	}
+
+	public void setNivol(String nivol) {
+		this.nivol = nivol;
 	}
 }
