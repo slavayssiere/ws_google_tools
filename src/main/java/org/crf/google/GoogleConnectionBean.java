@@ -1,5 +1,6 @@
 package org.crf.google;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -90,8 +91,13 @@ public class GoogleConnectionBean implements GoogleConnection {
     	boolean s3test = false;
     	try
     	{
-	    	this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-	                new InputStreamReader(getS3Data("client_secret_oauth.json").getObjectContent()));
+    		//this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+	        //        new InputStreamReader(getS3Data("client_secret_oauth.json").getObjectContent()));
+    		String google_cred = System.getenv("GOOGL_CRED");
+    		logger.info("GOOGL_CRED: " + google_cred);
+    		this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
+	                new InputStreamReader(new ByteArrayInputStream(google_cred.getBytes())));
+    		
 	    	s3test = true;
     	}
     	catch(AmazonS3Exception ase){
@@ -99,7 +105,6 @@ public class GoogleConnectionBean implements GoogleConnection {
     		s3test = false;
             
     	} catch (IOException e) {
-			e.printStackTrace();
 			s3test = false;
 		}
     	
@@ -115,16 +120,6 @@ public class GoogleConnectionBean implements GoogleConnection {
     	
 		return null;    	
     }
-    
-    private InputStream getSecretFile() {
-		try {
-			return (InputStream)getS3Data("client_secret.json").getObjectContent();
-		} catch (AmazonS3Exception ase) {
-			logger.info("we are on dev machine");
-		}
-
-		return SheetServiceBean.class.getResourceAsStream("/client_secret.json");
-	}
 
     /* (non-Javadoc)
 	 * @see org.crf.google.GoogleConnection#token_create(java.lang.String, java.lang.String)

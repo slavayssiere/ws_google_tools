@@ -1,5 +1,6 @@
 package org.crf.google;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -86,50 +87,14 @@ public class GoogleConnectionBatch implements GoogleConnection {
        
    }
 
-	private S3Object getS3Data(String filename) {
-		AmazonS3 s3 = new AmazonS3Client();
-		Region euWest1 = Region.getRegion(Regions.EU_WEST_1);
-		s3.setRegion(euWest1);
-		try {
-			return s3.getObject(new GetObjectRequest("static-private-file", filename));
-		} catch (AmazonS3Exception ase) {
-			throw ase;
-		}
-	}
-
-	private GoogleClientSecrets getClientSecret() {
-
-		boolean s3test = false;
-		try {
-			this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY,
-					new InputStreamReader(getS3Data("formation-management.json").getObjectContent()));
-			s3test = true;
-		} catch (AmazonS3Exception ase) {
-			System.out.println("we are on dev machine");
-			s3test = false;
-
-		} catch (IOException e) {
-			e.printStackTrace();
-			s3test = false;
-		}
-
-		if (!s3test) {
-			try {
-				this.clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(
-						SheetServiceBean.class.getResourceAsStream("/formation-management.json")));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-
-		return null;
-	}
-
 	private InputStream getSecretFile() {
 		try {
-			return (InputStream) getS3Data("formation-management.json").getObjectContent();
-		} catch (AmazonS3Exception ase) {
+			String google_cred = System.getenv("GOOGL_CRED");
+    		logger.info("GOOGL_CRED: " + google_cred);
+    		
+			String google_cred_batch = System.getenv("GOOGL_CRED_BATCH");
+    		return new ByteArrayInputStream(google_cred_batch.getBytes());
+		} catch (Exception ase) {
 			logger.info("we are on dev machine");
 		}
 
